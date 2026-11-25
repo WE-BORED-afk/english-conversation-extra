@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>แบบฝึก Conversation + Extra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --bg-header: rgba(248, 250, 252, 0.94);
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --card-border: #f1f5f9;
+      --fg: #0f172a;
+      --muted: #64748b;
+      --primary: #2563eb;
+      --primary-fg: #ffffff;
+      --green: #10b981;
+      --green-text: #047857;
+      --green-bg: rgba(16, 185, 129, 0.12);
+      --amber: #b45309;
+      --amber-bg: rgba(245, 158, 11, 0.14);
+      --extra-line: rgba(37, 99, 235, 0.45);
+      --shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --bg-header: rgba(15, 23, 42, 0.94);
+      --card: #1e293b;
+      --border: #334155;
+      --card-border: #273449;
+      --fg: #f1f5f9;
+      --muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-fg: #ffffff;
+      --green: #10b981;
+      --green-text: #34d399;
+      --green-bg: rgba(16, 185, 129, 0.16);
+      --amber: #fbbf24;
+      --amber-bg: rgba(245, 158, 11, 0.16);
+      --extra-line: rgba(59, 130, 246, 0.55);
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 960px; margin: 0 auto; padding: 0 16px 40px; }
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--bg-header);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0 12px;
+      margin-bottom: 20px;
+    }
+    .header-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    h1 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+    .subtitle { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+    .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .tabs {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: 9px;
+      padding: 2px;
+    }
+    .tab-btn {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .tab-btn.active { background: var(--primary); color: var(--primary-fg); }
+    .theme-btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--fg);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 10px;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+    .theme-btn:hover { border-color: var(--primary); }
+    .controls { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pill {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 11px;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .pill.active { background: var(--primary); border-color: var(--primary); color: var(--primary-fg); }
+    .search-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .search-input {
+      flex: 1 1 220px;
+      min-width: 200px;
+      padding: 7px 12px;
+      font-family: inherit;
+      font-size: 13px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--fg);
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--primary); }
+    .toggles { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-size: 12px; }
+    .toggle-label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+    .toggle-label input { width: 15px; height: 15px; accent-color: var(--primary); cursor: pointer; }
+    .toggle-label input.ans-cb { accent-color: var(--green); }
+    .count-badge { color: var(--muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .hidden { display: none !important; }
+    .section-group { margin-bottom: 24px; }
+    .section-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 0 8px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-head h2 { margin: 0; font-size: 15px; font-weight: 700; }
+    .section-head span { font-size: 12px; color: var(--muted); }
+    .cards-stack { display: flex; flex-direction: column; gap: 12px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .card.highlight { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-bg); }
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .card-title-row { display: flex; align-items: center; gap: 8px; }
+    .q-num { font-size: 15px; font-weight: 700; }
+    .page-tag {
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 1px 8px;
+      border-radius: 6px;
+    }
+    .set-tag { font-size: 12px; color: var(--muted); }
+    .choices { display: flex; flex-direction: column; gap: 6px; }
+    .choice-row { display: flex; align-items: flex-start; gap: 10px; padding: 3px 0; }
+    .num-badge {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .num-badge.answer {
+      border-radius: 9999px;
+      border: 2px solid var(--green);
+      background: var(--green-bg);
+      color: var(--green-text);
+      font-weight: 700;
+    }
+    .choice-body { flex: 1; min-width: 0; padding-top: 2px; }
+    .choice-th { font-size: 14px; line-height: 1.55; }
+    .choice-th.answer { font-weight: 600; }
+    .extra-box {
+      margin-top: 6px;
+      padding-left: 10px;
+      border-left: 2px solid var(--extra-line);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .extra-label { font-weight: 700; color: var(--primary); }
+    .extra-target { color: var(--muted); }
+    .empty-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px 16px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+    .stat-label { font-size: 12px; color: var(--muted); }
+    .stat-val { font-size: 18px; font-weight: 700; margin-top: 2px; }
+    .stat-val.green { color: var(--green-text); }
+    .stat-val.amber { color: var(--amber); }
+    .table-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .table-head { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    .table-head h2 { margin: 0; font-size: 15px; font-weight: 700; }
+    .table-head p { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
+    thead { background: var(--bg); color: var(--muted); }
+    th, td { padding: 9px 12px; vertical-align: top; }
+    tbody tr { border-top: 1px solid var(--border); }
+    .jump-btn {
+      border: 0;
+      background: transparent;
+      padding: 0;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary);
+      cursor: pointer;
+      text-align: left;
+    }
+    .jump-btn:hover { text-decoration: underline; }
+    .status-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .status-pill.ok { background: var(--green-bg); color: var(--green-text); }
+    .status-pill.warn { background: var(--amber-bg); color: var(--amber); }
+    .syn-sub { color: var(--muted); margin-top: 3px; }
+    .note-sub { color: var(--muted); margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="sticky-header">
+      <div class="header-top">
+        <div>
+          <h1>แบบฝึก Conversation + Extra</h1>
+          <p class="subtitle">6 ชุดข้อสอบ · 150 ข้อ (หน้า 1–38) · Extra 89 หน้า (91 รายการ · จับคู่ตัวเลือก 90 รายการ)</p>
+        </div>
+        <div class="header-actions">
+          <div class="tabs">
+            <button id="tab-exercises" type="button" class="tab-btn active">แบบฝึก (150 ข้อ)</button>
+            <button id="tab-extra" type="button" class="tab-btn">ตาราง Extra (89 หน้า)</button>
+          </div>
+          <button id="theme-toggle" type="button" class="theme-btn" aria-label="สลับโหมดสี">โหมดมืด</button>
+        </div>
+      </div>
+
+      <div id="exercise-controls" class="controls">
+        <div id="set-filters" class="filters"></div>
+        <div class="search-row">
+          <input id="search-input" type="search" class="search-input" placeholder="ค้นหาข้อ, หน้า, คำแปลภาษาไทย, หรือวลี Extra..." />
+          <div class="toggles">
+            <label class="toggle-label">
+              <input id="toggle-answers" type="checkbox" checked class="ans-cb" />
+              <span>แสดงวงกลมสีเขียวเฉลย</span>
+            </label>
+            <label class="toggle-label">
+              <input id="toggle-only-extra" type="checkbox" />
+              <span>เฉพาะข้อที่มี Extra</span>
+            </label>
+            <span id="visible-count" class="count-badge">แสดง 150 / 150 ข้อ</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main id="view-exercises"></main>
+    <section id="view-extra" class="hidden"></section>
+  </div>
+
+  <script>
+    const QUESTIONS = [
+{"id":"TGAT_69_p1_q1","s":"TGAT 69","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":1,"q":1,"a":1,"c":[{"n":1,"t":"ใช่ หญ้าดูเปียกเลย","e":[]},{"n":2,"t":"ไม่หรอก ในเรื่องร้ายยังมีสิ่งดี ๆ ซ่อนอยู่เสมอ","e":[3]},{"n":3,"t":"เมื่อวานตอนบ่ายฝนกำลังตกอยู่","e":[]},{"n":4,"t":"มีเมฆดำมืดอยู่ไกล ๆ โน่น","e":[]}]},
+{"id":"TGAT_69_p1_q2","s":"TGAT 69","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":1,"q":2,"a":4,"c":[{"n":1,"t":"ด้วยความยินดีอย่างยิ่ง","e":[70]},{"n":2,"t":"ฉันรู้สึกซาบซึ้งในความมีน้ำใจของคุณมาก","e":[]},{"n":3,"t":"คุณควรเคาะประตูก่อนเข้ามานะ","e":[]},{"n":4,"t":"ไม่ต้องกังวลหรอก! ฉันรู้ดีว่าการเดินทางตอนเช้าเป็นยังไง","e":[71]}]},
+{"id":"TGAT_69_p1_q3","s":"TGAT 69","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":1,"q":3,"a":4,"c":[{"n":1,"t":"ใช่ ยินดีที่ได้รู้จักนะ!","e":[72]},{"n":2,"t":"แน่นอน ฉันไม่ค่อยแน่ใจเท่าไหร่","e":[]},{"n":3,"t":"ฉันน่าจะไปไม่ได้เพราะฉันยุ่งอยู่","e":[]},{"n":4,"t":"จำได้สิ! คุณนั่งอยู่ใกล้ทางออกใช่ไหมล่ะ","e":[]}]},
+{"id":"TGAT_69_p1_q4","s":"TGAT 69","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":1,"q":4,"a":4,"c":[{"n":1,"t":"ด้วยความยินดีเลย","e":[27]},{"n":2,"t":"เอ่อ ฉันก็จะอ่านหนังสือเหมือนกัน","e":[]},{"n":3,"t":"ขอโทษนะ คุณรู้จักเพลงนี้ไหม","e":[]},{"n":4,"t":"ขอโทษทีนะ ฉันไม่รู้ตัวเลยว่ามันรบกวนคุณอยู่","e":[]}]},
+{"id":"TGAT_69_p1_q5","s":"TGAT 69","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":1,"q":5,"a":3,"c":[{"n":1,"t":"คุณเข้าใจฉันผิดแล้ว","e":[]},{"n":2,"t":"ฉันเพิ่งสอบได้คะแนนยอดเยี่ยมเมื่อเช้านี้เอง","e":[]},{"n":3,"t":"ฉันแค่เบื่อหน่ายกับงานที่ได้รับมอบหมายพวกนี้เต็มทีแล้ว","e":[]},{"n":4,"t":"การเป็นคนพูดตรงไปตรงมามันไม่เห็นมีอะไรผิดเลย","e":[]}]},
+{"id":"TGAT_69_p2_q6","s":"TGAT 69","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":2,"q":6,"a":3,"c":[{"n":1,"t":"คุณต้องการความช่วยเหลือไหม (ให้ฉันช่วยไหม)","e":[84]},{"n":2,"t":"คุณได้ขอให้คนอื่นช่วยไปแล้วไม่ใช่เหรอ","e":[]},{"n":3,"t":"วันอาทิตย์นี้พวกเราจะไปแจกอาหารให้คนไร้บ้านกัน คุณสนใจไหม","e":[]},{"n":4,"t":"คุณจะว่าอะไรไหมถ้าฉันช่วยทำสไลด์นำเสนองานให้","e":[]}]},
+{"id":"TGAT_69_p2_q7","s":"TGAT 69","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":2,"q":7,"a":3,"c":[{"n":1,"t":"ไม่เป็นไรเลย ทำตัวตามสบายนะ","e":[]},{"n":2,"t":"ขอบคุณนะ! เขาบอกว่าดีใจมากที่ได้มาที่นี่","e":[]},{"n":3,"t":"ขอบคุณที่ต้อนรับ (เชิญมา) นะ เป็นปาร์ตี้ที่ดีมากเลย","e":[]},{"n":4,"t":"ขอบคุณที่ชวนนะ ฉันจะมาแน่นอน","e":[]}]},
+{"id":"TGAT_69_p2_q8","s":"TGAT 69","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":2,"q":8,"a":1,"c":[{"n":1,"t":"เราเรียกแท็กซี่ไปกันเลยดีไหม","e":[]},{"n":2,"t":"ห้างสรรพสินค้าปิดกี่โมงเหรอ","e":[]},{"n":3,"t":"เราเลื่อนทริปไปชอปปิงออกไปก่อนดีไหม","e":[]},{"n":4,"t":"เราค่อยว่ากันหน้างานแล้วเดินไปที่นั่นกันเถอะ","e":[2]}]},
+{"id":"TGAT_69_p2_q9","s":"TGAT 69","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":2,"q":9,"a":3,"c":[{"n":1,"t":"เธอชอบศิลปะและดนตรีมาก","e":[]},{"n":2,"t":"เธอค่อนข้างสูงและไว้ผมยาวสีเข้ม","e":[]},{"n":3,"t":"เธอเป็นมิตรและเข้าถึงง่ายมาก","e":[]},{"n":4,"t":"เธอสนุกกับกิจกรรมนอกหลักสูตรทุกรูปแบบเลย","e":[]}]},
+{"id":"TGAT_69_p2_q10","s":"TGAT 69","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":2,"q":10,"a":2,"c":[{"n":1,"t":"เกมนั้นดูเจ๋งมากเลย!","e":[]},{"n":2,"t":"นั่นแหละเหตุผลที่ฉันไม่เคยทำแบบนั้นเลย","e":[]},{"n":3,"t":"ห้องลองเสื้ออยู่ตรงโน้นเลย","e":[]},{"n":4,"t":"คุณน่าจะไปเดินดูของตามหน้าร้านแบบไม่ซื้อแทนนะ","e":[]}]},
+{"id":"TGAT_69_p3_q11","s":"TGAT 69","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 1 (ข้อ 11–13)","p":3,"q":11,"a":2,"c":[{"n":1,"t":"พวกเราเริ่มทัวร์กันไปแล้วล่ะ","e":[]},{"n":2,"t":"อากาศดีไม่มีที่ติเลย","e":[]},{"n":3,"t":"วันนี้ไม่มีส่วนลดค่าตั๋วนะ","e":[]},{"n":4,"t":"วันนี้มีนักท่องเที่ยวมาเข้าร่วมกับเราเยอะเลย","e":[]}]},
+{"id":"TGAT_69_p3_q12","s":"TGAT 69","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 1 (ข้อ 11–13)","p":3,"q":12,"a":3,"c":[{"n":1,"t":"ทัวร์นี้จะใช้เวลานานแค่ไหน","e":[]},{"n":2,"t":"ฉันต้องไปขึ้นเรือที่ท่าเรือไหน","e":[]},{"n":3,"t":"พวกเราจะไปที่ไหนเป็นที่แรกเหรอ","e":[]},{"n":4,"t":"พวกเราจะเริ่มออกเดินทางกันเมื่อไหร่","e":[]}]},
+{"id":"TGAT_69_p3_q13","s":"TGAT 69","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 1 (ข้อ 11–13)","p":3,"q":13,"a":4,"c":[{"n":1,"t":"ฉันก็เหมือนกัน","e":[]},{"n":2,"t":"ฉันก็ไม่เช่นกัน","e":[]},{"n":3,"t":"เรามาเริ่มกันเลยเถอะ","e":[]},{"n":4,"t":"ฉันก็รอไม่ไหวแล้วเหมือนกัน","e":[]}]},
+{"id":"TGAT_69_p4_q14","s":"TGAT 69","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 2 (ข้อ 14–16) — เนื้อหาบทสนทนาอยู่ที่หน้า 3–4","p":4,"q":14,"a":3,"c":[{"n":1,"t":"ขอโทษที่รบกวนนะ","e":[]},{"n":2,"t":"เมื่อกี้เกิดอะไรขึ้นเหรอ","e":[]},{"n":3,"t":"มีเรื่องอะไรที่ทำให้คุณไม่สบายใจอยู่เหรอ","e":[]},{"n":4,"t":"เกิดอะไรขึ้นกับหน้าของคุณเหรอ","e":[]}]},
+{"id":"TGAT_69_p4_q15","s":"TGAT 69","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 2 (ข้อ 14–16) — เนื้อหาบทสนทนาอยู่ที่หน้า 3–4","p":4,"q":15,"a":2,"c":[{"n":1,"t":"ลางานไปเที่ยวพักผ่อนบ้าง","e":[]},{"n":2,"t":"มองหาตำแหน่งงานอื่น ๆ ที่เปิดรับอยู่","e":[]},{"n":3,"t":"ตัดขาดความสัมพันธ์กับเจ้านายของฉัน","e":[58]},{"n":4,"t":"ปฏิเสธทุกข้อเสนอที่ฉันได้รับ","e":[]}]},
+{"id":"TGAT_69_p4_q16","s":"TGAT 69","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 2 (ข้อ 14–16) — เนื้อหาบทสนทนาอยู่ที่หน้า 3–4","p":4,"q":16,"a":4,"c":[{"n":1,"t":"มันดีกว่างานเก่าของคุณไหม","e":[]},{"n":2,"t":"คุณควรอยู่ตรงที่เดิมต่อไปนั่นแหละ","e":[]},{"n":3,"t":"สำหรับฉันนั่นฟังดูเป็นการตัดสินใจที่แย่มากเลยนะ","e":[]},{"n":4,"t":"คนเก่งอย่างคุณคงอยู่ในตลาดหางานได้ไม่นานหรอก","e":[]}]},
+{"id":"TGAT_69_p5_q17","s":"TGAT 69","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 3 (ข้อ 17–20) — เนื้อหาบทสนทนาอยู่ที่หน้า 4","p":5,"q":17,"a":1,"c":[{"n":1,"t":"มันไม่ใช่แนวของฉันเท่าไหร่เลย","e":[10]},{"n":2,"t":"ฉันหยุดแนะนำเรื่องนี้ให้คนอื่นไม่ได้เลย","e":[]},{"n":3,"t":"ฉันดูครบทุกตอนตั้งสองรอบแล้ว","e":[]},{"n":4,"t":"ฉันคิดว่ามันดีกว่าซีรีส์เกาหลีเรื่องไหน ๆ เลย","e":[]}]},
+{"id":"TGAT_69_p5_q18","s":"TGAT 69","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 3 (ข้อ 17–20) — เนื้อหาบทสนทนาอยู่ที่หน้า 4","p":5,"q":18,"a":4,"c":[{"n":1,"t":"ฉันชอบตอนจบแบบทิ้งปมให้ค้างคาใจนะ","e":[]},{"n":2,"t":"ฉันแค่ไม่ค่อยอินกับการดำเนินเรื่องที่เนิบช้า","e":[]},{"n":3,"t":"จุดหักมุมของเรื่องมันเดาง่ายเกินไปหน่อย","e":[]},{"n":4,"t":"พวกเขาทุกคนดูเหมือนเป็นตัวร้ายได้หมดเลย","e":[]}]},
+{"id":"TGAT_69_p5_q19","s":"TGAT 69","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 3 (ข้อ 17–20) — เนื้อหาบทสนทนาอยู่ที่หน้า 4","p":5,"q":19,"a":1,"c":[{"n":1,"t":"ฉันจะเอาเงินไปช่วยเหลือผู้ที่กำลังเดือดร้อน","e":[]},{"n":2,"t":"ฉันจะไม่ใส่รองเท้าคู่เดิมซ้ำสองครั้งเด็ดขาด","e":[]},{"n":3,"t":"ฉันจะซื้อเกาะส่วนตัวแล้วไปใช้ชีวิตอยู่ที่นั่นอย่างสงบสุข","e":[]},{"n":4,"t":"ฉันจะซื้อวิลล่าแบบเดียวกับในซีรีส์เป๊ะ ๆ เลย","e":[]}]},
+{"id":"TGAT_69_p5_q20","s":"TGAT 69","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 3 (ข้อ 17–20) — เนื้อหาบทสนทนาอยู่ที่หน้า 4","p":5,"q":20,"a":4,"c":[{"n":1,"t":"กุหลาบร้าย (Evil Rose)","e":[]},{"n":2,"t":"แมวมองความรัก (Love Scout)","e":[]},{"n":3,"t":"ดอกบัวสีดำ (Black Lotus)","e":[]},{"n":4,"t":"ดอกบัวนางฟ้า (Angel Lotus)","e":[]}]},
+{"id":"TGAT_69_p6_q21","s":"TGAT 69","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 1 (ข้อ 21–25) — เนื้อหาบทสนทนาอยู่ที่หน้า 5–6","p":6,"q":21,"a":1,"c":[{"n":1,"t":"มันเป็นเรื่องเกี่ยวกับอะไรเหรอ","e":[]},{"n":2,"t":"มันออกฉายเมื่อไหร่เหรอ","e":[]},{"n":3,"t":"ใครแนะนำเรื่องนี้ให้คุณเหรอ","e":[]},{"n":4,"t":"มีทั้งหมดกี่ตอนเหรอ","e":[]}]},
+{"id":"TGAT_69_p6_q22","s":"TGAT 69","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 1 (ข้อ 21–25) — เนื้อหาบทสนทนาอยู่ที่หน้า 5–6","p":6,"q":22,"a":4,"c":[{"n":1,"t":"ฉันก็ค่อนข้างชอบมันนะ","e":[]},{"n":2,"t":"ฮ่า! ก็เหมือนเดิมตลอดแหละ","e":[]},{"n":3,"t":"คำพูดสามารถทำร้ายคนอื่นได้นะ","e":[]},{"n":4,"t":"ฉันก็อยากมีพลังแบบนั้นบ้างเหมือนกัน","e":[]}]},
+{"id":"TGAT_69_p6_q23","s":"TGAT 69","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 1 (ข้อ 21–25) — เนื้อหาบทสนทนาอยู่ที่หน้า 5–6","p":6,"q":23,"a":4,"c":[{"n":1,"t":"เรื่องนั้นมันเห็นได้ชัดอยู่แล้ว","e":[]},{"n":2,"t":"เรื่องนั้นมันเป็นไปได้นะ","e":[]},{"n":3,"t":"เรื่องนั้นมันหลีกเลี่ยงไม่ได้หรอก","e":[]},{"n":4,"t":"เป็นไปไม่ได้หรอก","e":[]}]},
+{"id":"TGAT_69_p6_q24","s":"TGAT 69","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 1 (ข้อ 21–25) — เนื้อหาบทสนทนาอยู่ที่หน้า 5–6","p":6,"q":24,"a":2,"c":[{"n":1,"t":"สู้กลับทุกครั้งที่มีโอกาส","e":[]},{"n":2,"t":"เมินเฉยต่อสิ่งที่พวกเขาพูดแล้วเดินหนีไปเลย","e":[]},{"n":3,"t":"หัวเราะเยาะพวกเขาก่อนที่พวกเขาจะหัวเราะเยาะคุณ","e":[]},{"n":4,"t":"คว้าโอกาสเข้าไปเผชิญหน้ากับพวกเขาตรง ๆ เลย","e":[28]}]},
+{"id":"TGAT_69_p6_q25","s":"TGAT 69","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 1 (ข้อ 21–25) — เนื้อหาบทสนทนาอยู่ที่หน้า 5–6","p":6,"q":25,"a":2,"c":[{"n":1,"t":"แกล้งทำเป็นไม่มีอะไรเกิดขึ้น","e":[]},{"n":2,"t":"ติดต่อขอความช่วยเหลือจากคนที่คุณไว้ใจ","e":[]},{"n":3,"t":"หลีกเลี่ยงการไปโรงเรียนไปเลย","e":[]},{"n":4,"t":"ลงมือจัดการเรื่องนี้ด้วยตัวเองเลย","e":[]}]},
+{"id":"TGAT_69_p7_q26","s":"TGAT 69","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 2 (ข้อ 26–30) — เนื้อหาบทสนทนาอยู่ที่หน้า 7","p":7,"q":26,"a":3,"c":[{"n":1,"t":"ทางตัน","e":[59]},{"n":2,"t":"เหตุการณ์เฉียดฉิว","e":[]},{"n":3,"t":"หายนะอย่างสิ้นเชิง","e":[]},{"n":4,"t":"ความสำเร็จครั้งยิ่งใหญ่","e":[]}]},
+{"id":"TGAT_69_p7_q27","s":"TGAT 69","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 2 (ข้อ 26–30) — เนื้อหาบทสนทนาอยู่ที่หน้า 7","p":7,"q":27,"a":1,"c":[{"n":1,"t":"ท้อแท้หมดกำลังใจ","e":[]},{"n":2,"t":"ปอดแหก (กลัวจนไม่กล้าทำ)","e":[]},{"n":3,"t":"สู้ต่อไป / อดทนไว้","e":[62]},{"n":4,"t":"ตั้งความหวังไว้สูง","e":[8]}]},
+{"id":"TGAT_69_p7_q28","s":"TGAT 69","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 2 (ข้อ 26–30) — เนื้อหาบทสนทนาอยู่ที่หน้า 7","p":7,"q":28,"a":3,"c":[{"n":1,"t":"ทำแบบลวก ๆ (มักง่าย) เพื่อลดขั้นตอน","e":[12]},{"n":2,"t":"ละลายพฤติกรรม (ทำลายความอึดอัดใจ)","e":[13]},{"n":3,"t":"เข้มแข็งเข้าไว้ อย่าเพิ่งท้อ","e":[11]},{"n":4,"t":"มองข้ามคุณค่าของสิ่งต่าง ๆ (คิดว่าเป็นของตาย)","e":[19]}]},
+{"id":"TGAT_69_p8_q29","s":"TGAT 69","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 2 (ข้อ 26–30) — เนื้อหาบทสนทนาอยู่ที่หน้า 7","p":8,"q":29,"a":4,"c":[{"n":1,"t":"เข้านอน","e":[66]},{"n":2,"t":"ขีดเส้นแบ่ง (กำหนดขอบเขต)","e":[18]},{"n":3,"t":"ทุ่มเทความพยายามให้มากขึ้นเป็นพิเศษ","e":[52]},{"n":4,"t":"ยอมแพ้ (ถอดใจเลิกทำ)","e":[9]}]},
+{"id":"TGAT_69_p8_q30","s":"TGAT 69","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 2 (ข้อ 26–30) — เนื้อหาบทสนทนาอยู่ที่หน้า 7","p":8,"q":30,"a":1,"c":[{"n":1,"t":"ลองพยายามดูอีกสักตั้ง","e":[16]},{"n":2,"t":"เข้าประเด็นตรง ๆ เลย","e":[6]},{"n":3,"t":"ปล่อยไปตามน้ำ (ตามสถานการณ์)","e":[]},{"n":4,"t":"ฟังหูไว้หู","e":[1]}]},
+{"id":"A-Level_69_p8_q1","s":"A-Level 69","pt":"","cv":"Conversation 1 (ข้อ 1–4) — Situation: At a restaurant","p":8,"q":1,"a":1,"c":[{"n":1,"t":"ฉันสั่งแค่อาหารจานง่าย ๆ เอง","e":[]},{"n":2,"t":"ฉันไม่ชอบการบริการที่นี่เลย","e":[]},{"n":3,"t":"ที่นี่คนแน่นมาก","e":[]},{"n":4,"t":"คุณภาพอาหารลดลง","e":[]}]},
+{"id":"A-Level_69_p9_q2","s":"A-Level 69","pt":"","cv":"Conversation 1 (ข้อ 1–4) — Situation: At a restaurant","p":9,"q":2,"a":2,"c":[{"n":1,"t":"การเสิร์ฟอาหารอย่างตรงเวลาเป็นเรื่องสำคัญสำหรับเรา","e":[]},{"n":2,"t":"ช่วงนี้ทางร้านของเราขาดแคลนพนักงานไปหน่อย","e":[]},{"n":3,"t":"ขอบคุณที่อดทนรอระหว่างที่เกิดความล่าช้า","e":[]},{"n":4,"t":"การเตรียมอาหารที่ร้านของเราใช้เวลาไม่นาน","e":[]}]},
+{"id":"A-Level_69_p9_q3","s":"A-Level 69","pt":"","cv":"Conversation 1 (ข้อ 1–4) — Situation: At a restaurant","p":9,"q":3,"a":3,"c":[{"n":1,"t":"พวกเขาทราบว่าคุณพึงพอใจ","e":[]},{"n":2,"t":"เชฟจะปรับปรุงรสชาติให้ดียิ่งขึ้น","e":[21]},{"n":3,"t":"ออเดอร์ของคุณจะได้รับการจัดลำดับความสำคัญเป็นพิเศษในวันนี้","e":[44]},{"n":4,"t":"จะมีการนำอาหารส่วนที่เพิ่มมาออกไป","e":[]}]},
+{"id":"A-Level_69_p9_q4","s":"A-Level 69","pt":"","cv":"Conversation 1 (ข้อ 1–4) — Situation: At a restaurant","p":9,"q":4,"a":2,"c":[{"n":1,"t":"ฉันไม่คาดคิดว่าจะต้องรอนาน","e":[]},{"n":2,"t":"ขอบคุณที่ช่วยจัดการเรื่องที่ฉันกังวลครับ/ค่ะ","e":[]},{"n":3,"t":"เครื่องดื่มฟรีแค่นั้นคงไม่พอหรอก","e":[]},{"n":4,"t":"ฉันมีแนวโน้มที่จะให้ข้อเสนอแนะเพิ่มเติม","e":[]}]},
+{"id":"A-Level_69_p9_q5","s":"A-Level 69","pt":"","cv":"Conversation 2 (Item 5 - 8)","p":9,"q":5,"a":1,"c":[{"n":1,"t":"แล้วคุณล่ะ","e":[]},{"n":2,"t":"คุณไปเที่ยวที่ไหนมาเหรอ","e":[]},{"n":3,"t":"คุณรู้ไหมว่ามันอยู่ที่ไหน","e":[]},{"n":4,"t":"คุณเคยไปที่นั่นมาก่อนไหม","e":[]}]},
+{"id":"A-Level_69_p10_q6","s":"A-Level 69","pt":"","cv":"Conversation 2 (Item 5 - 8)","p":10,"q":6,"a":4,"c":[{"n":1,"t":"ที่นี่สมัครงานง่ายไหม","e":[]},{"n":2,"t":"ฉันเคยทำงานให้บริษัทบางแห่งที่นี่มาก่อน","e":[]},{"n":3,"t":"คุณอาจจะอยากหางานทำหลังจากไปเที่ยวเสร็จก็ได้นะ","e":[]},{"n":4,"t":"คุณมีบริษัทที่เล็งไว้ในใจบ้างหรือยัง","e":[]}]},
+{"id":"A-Level_69_p10_q7","s":"A-Level 69","pt":"","cv":"Conversation 2 (Item 5 - 8)","p":10,"q":7,"a":1,"c":[{"n":1,"t":"ฉันเริ่มส่งเรซูเม่ (CV) ไปยังบริษัทใหญ่ๆ ในย่านใจกลางเมืองบ้างแล้ว","e":[]},{"n":2,"t":"เดี๋ยวฉันจะบอกนะว่าฉันจะไปอเมริกาใต้กับคุณได้ไหม","e":[]},{"n":3,"t":"ฉันพบว่างานใหม่นี้น่าตื่นเต้นและเป็นประโยชน์ต่อประสบการณ์ของฉันมาก","e":[]},{"n":4,"t":"เทอมหน้าฉันจะลงเรียนวิชาการตลาดและการจัดการสักหน่อย","e":[]}]},
+{"id":"A-Level_69_p10_q8","s":"A-Level 69","pt":"","cv":"Conversation 2 (Item 5 - 8)","p":10,"q":8,"a":3,"c":[{"n":1,"t":"เดี๋ยวฉันจะลาออกจากงานเร็วๆ นี้แล้ว","e":[]},{"n":2,"t":"แล้วทริปของพวกเราก็จะเริ่มต้นทันที","e":[]},{"n":3,"t":"ไม่ว่าพวกเราจะทำอะไร เราก็ต้องติดต่อกันไว้นะ","e":[]},{"n":4,"t":"เท่าที่ฉันรู้ บริษัทบางแห่งก็ไม่ขอเรซูเม่ (CV) นะ","e":[]}]},
+{"id":"A-Level_69_p11_q9","s":"A-Level 69","pt":"","cv":"Conversation 3 (Item 9 - 12)","p":11,"q":9,"a":1,"c":[{"n":1,"t":"ฉันตั้งใจฟังอยู่เต็มที่เลย","e":[90]},{"n":2,"t":"ช่วยฟังฉันหน่อยสิ","e":[48]},{"n":3,"t":"ฉันยุ่งหัวหมุนเลย (งานล้นมือเลย)","e":[68]},{"n":4,"t":"หูฉันอื้อวิ้งไปหมดแล้ว","e":[]}]},
+{"id":"A-Level_69_p11_q10","s":"A-Level 69","pt":"","cv":"Conversation 3 (Item 9 - 12)","p":11,"q":10,"a":2,"c":[{"n":1,"t":"เราเสียเวลาไปหนึ่งวัน","e":[65]},{"n":2,"t":"วันนี้เราหยุดเรียนนะ","e":[64]},{"n":3,"t":"วันนี้เรามีตารางเรียน/งานเต็มวันเลย","e":[60]},{"n":4,"t":"เราตามหลังอยู่หนึ่งวัน","e":[]}]},
+{"id":"A-Level_69_p11_q11","s":"A-Level 69","pt":"","cv":"Conversation 3 (Item 9 - 12)","p":11,"q":11,"a":4,"c":[{"n":1,"t":"หากจะอธิบายให้ชัดๆ ก็คือ","e":[30]},{"n":2,"t":"พูดอีกอย่างหนึ่งก็คือ","e":[]},{"n":3,"t":"พูดออกนอกเรื่องไปหน่อยก็คือ","e":[]},{"n":4,"t":"ที่แย่ไปกว่านั้นก็คือ","e":[51]}]},
+{"id":"A-Level_69_p11_q12","s":"A-Level 69","pt":"","cv":"Conversation 3 (Item 9 - 12)","p":11,"q":12,"a":2,"c":[{"n":1,"t":"เก็บออมไว้ใช้ในยามลำบาก","e":[7]},{"n":2,"t":"เคราะห์ซ้ำกรรมซัด (เวลาเกิดเรื่องร้ายมักจะประดังเข้ามาพร้อมๆ กัน)","e":[36]},{"n":3,"t":"ฝนตกหนักมาก","e":[14]},{"n":4,"t":"ในเรื่องร้ายย่อมมีเรื่องดีซ่อนอยู่เสมอ","e":[]}]},
+{"id":"A-Level_69_p12_q13","s":"A-Level 69","pt":"","cv":"Conversation 1 (Item 13 -20)","p":12,"q":13,"a":4,"c":[{"n":1,"t":"เท่าที่ / ในแง่ที่","e":[50,89]},{"n":2,"t":"อย่างมากที่สุดแล้ว","e":[]},{"n":3,"t":"ในทางกลับกัน","e":[73]},{"n":4,"t":"เพื่อไม่ให้เป็นการเสียเวลา","e":[]}]},
+{"id":"A-Level_69_p12_q14","s":"A-Level 69","pt":"","cv":"Conversation 1 (Item 13 -20)","p":12,"q":14,"a":1,"c":[{"n":1,"t":"ในเมื่อตอนนี้","e":[]},{"n":2,"t":"มิฉะนั้น","e":[]},{"n":3,"t":"ในกรณีนั้น","e":[]},{"n":4,"t":"ตราบใดที่","e":[]}]},
+{"id":"A-Level_69_p12_q15","s":"A-Level 69","pt":"","cv":"Conversation 1 (Item 13 -20)","p":12,"q":15,"a":2,"c":[{"n":1,"t":"ขีดเส้นแบ่งให้ชัดเจน (กำหนดขอบเขต)","e":[]},{"n":2,"t":"พูดให้ตรงประเด็น","e":[35]},{"n":3,"t":"ไหลไปตามน้ำ (ปล่อยไปตามสถานการณ์)","e":[15]},{"n":4,"t":"สนใจเรื่องของตัวเองเถอะ","e":[17]}]},
+{"id":"A-Level_69_p13_q16","s":"A-Level 69","pt":"","cv":"Conversation 1 (Item 13 -20)","p":13,"q":16,"a":3,"c":[{"n":1,"t":"อย่างไรก็ตาม","e":[22]},{"n":2,"t":"แก้ปัญหาเฉพาะหน้าไปก่อน (ว่ากันไปตามสถานการณ์)","e":[69]},{"n":3,"t":"เดี๋ยวถึงเวลาก็ได้เอง (ทุกอย่างย่อมมีเวลาอันควรของมัน)","e":[5]},{"n":4,"t":"มองโลกในแง่ดีสิ","e":[]}]},
+{"id":"A-Level_69_p13_q17","s":"A-Level 69","pt":"","cv":"Conversation 1 (Item 13 -20)","p":13,"q":17,"a":2,"c":[{"n":1,"t":"เยี่ยมมาก","e":[46]},{"n":2,"t":"ใช่เลย / จริงอย่างยิ่ง","e":[]},{"n":3,"t":"ยอดเยี่ยมมาก / วิเศษมาก","e":[]},{"n":4,"t":"น่าทึ่งมาก / ไม่ธรรมดาเลย","e":[]}]},
+{"id":"A-Level_69_p13_q18","s":"A-Level 69","pt":"","cv":"Conversation 1 (Item 13 -20)","p":13,"q":18,"a":4,"c":[{"n":1,"t":"ไม่ว่าอย่างไรก็ตาม","e":[33]},{"n":2,"t":"อยู่ดีๆ โดยไม่ทันตั้งตัว","e":[4]},{"n":3,"t":"จะรับหรือไม่รับ ก็แล้วแต่คุณ","e":[34]},{"n":4,"t":"ท้ายที่สุดแล้ว","e":[32]}]},
+{"id":"A-Level_69_p13_q19","s":"A-Level 69","pt":"","cv":"Conversation 1 (Item 13 -20)","p":13,"q":19,"a":1,"c":[{"n":1,"t":"หากจะเปรียบเปรยให้เห็นภาพ","e":[49]},{"n":2,"t":"เพื่อชี้ให้เห็นความแตกต่าง","e":[]},{"n":3,"t":"เพื่อเปรียบเทียบความเหมือนและความต่าง","e":[]},{"n":4,"t":"เพื่อสรุปประเด็นหลักของผม/ดิฉัน","e":[]}]},
+{"id":"A-Level_69_p13_q20","s":"A-Level 69","pt":"","cv":"Conversation 1 (Item 13 -20)","p":13,"q":20,"a":2,"c":[{"n":1,"t":"พวกเราตั้งตารอคลาสเรียนสัปดาห์หน้าเลยครับ/ค่ะ","e":[]},{"n":2,"t":"ผม/ดิฉันหวังว่าจะได้เรียนกับอาจารย์ในเทอมหน้านะครับ/คะ","e":[]},{"n":3,"t":"พวกเราขอโทษที่มาเข้าเรียนผิดห้องครับ/ค่ะ","e":[]},{"n":4,"t":"ผม/ดิฉันหวังว่าอาจารย์จะให้เกรด A ในวิชานี้นะครับ/คะ","e":[]}]},
+{"id":"TGAT_68_p14_q1","s":"TGAT 68","pt":"Part I: Question-Response (Items 1-10)","cv":"","p":14,"q":1,"a":1,"c":[{"n":1,"t":"ไม่เลย แน่นอนครับ/ค่ะ (เชิญนั่งได้เลย)","e":[]},{"n":2,"t":"ไม่ต้องกังวลนะ","e":[0]},{"n":3,"t":"ฉันไม่เห็นด้วยเลยสักนิด","e":[]},{"n":4,"t":"คุณใจดีจังเลย","e":[]}]},
+{"id":"TGAT_68_p14_q2","s":"TGAT 68","pt":"Part I: Question-Response (Items 1-10)","cv":"","p":14,"q":2,"a":3,"c":[{"n":1,"t":"วันนี้ฉันรู้สึกดีมากเลย","e":[]},{"n":2,"t":"คืนนี้ออกไปกินข้าวเย็นข้างนอกกันเถอะ","e":[]},{"n":3,"t":"วันนี้อากาศแจ่มใส แดดดี","e":[]},{"n":4,"t":"คุณพอรู้เวลาไหม (กี่โมงแล้วเหรอ)","e":[]}]},
+{"id":"TGAT_68_p14_q3","s":"TGAT 68","pt":"Part I: Question-Response (Items 1-10)","cv":"","p":14,"q":3,"a":2,"c":[{"n":1,"t":"ใช่ ฉันไม่แน่ใจนะ","e":[]},{"n":2,"t":"ไม่ไปครับ/ค่ะ มีแค่สาย 14 เท่านั้นที่ไป","e":[]},{"n":3,"t":"ฉันกำลังจะไปสวนสาธารณะ","e":[]},{"n":4,"t":"ฉันจะเดินทางไปด้วยรถไฟใต้ดิน","e":[]}]},
+{"id":"TGAT_68_p14_q4","s":"TGAT 68","pt":"Part I: Question-Response (Items 1-10)","cv":"","p":14,"q":4,"a":3,"c":[{"n":1,"t":"นาฬิกาฉันเสีย ฉันต้องเอาไปซ่อม","e":[]},{"n":2,"t":"ฉันต้องจัดตารางเวลาสำหรับงานต่างๆ ของฉัน","e":[]},{"n":3,"t":"เราเปิดให้บริการตั้งแต่ 9.00 น. ถึง 17.00 น.","e":[]},{"n":4,"t":"ฉันรู้สึกไม่ค่อยสบาย","e":[20]}]},
+{"id":"TGAT_68_p14_q5","s":"TGAT 68","pt":"Part I: Question-Response (Items 1-10)","cv":"","p":14,"q":5,"a":4,"c":[{"n":1,"t":"มันตัดสินใจยากนะ","e":[]},{"n":2,"t":"ฉันสามารถรอต่อแถวยาวๆ ได้","e":[]},{"n":3,"t":"ฉันจะไปซื้อมาจากที่ร้าน","e":[]},{"n":4,"t":"มันสะดวกดี","e":[42]}]},
+{"id":"TGAT_68_p15_q6","s":"TGAT 68","pt":"Part I: Question-Response (Items 1-10)","cv":"","p":15,"q":6,"a":1,"c":[{"n":1,"t":"สัปดาห์ละ 3 ครั้ง","e":[]},{"n":2,"t":"ในช่วงบ่าย","e":[]},{"n":3,"t":"มันดีต่อสุขภาพของเรานะ","e":[]},{"n":4,"t":"แห่งที่อยู่ตรงหัวมุมถนนนั่นแหละ","e":[]}]},
+{"id":"TGAT_68_p15_q7","s":"TGAT 68","pt":"Part I: Question-Response (Items 1-10)","cv":"","p":15,"q":7,"a":2,"c":[{"n":1,"t":"พวกเราไปที่นั่นมาเมื่อปีที่แล้ว","e":[]},{"n":2,"t":"เป็นเวลา 1 สัปดาห์","e":[]},{"n":3,"t":"ยังไม่ใช่ปีนี้","e":[]},{"n":4,"t":"ฉันไม่คิดว่าจะได้ไปที่นั่นนะ","e":[]}]},
+{"id":"TGAT_68_p15_q8","s":"TGAT 68","pt":"Part I: Question-Response (Items 1-10)","cv":"","p":15,"q":8,"a":4,"c":[{"n":1,"t":"ฉันคิดว่าแบตเตอรี่คงหมดแล้วมั้ง","e":[]},{"n":2,"t":"มันช่วยประหยัดเวลาให้ฉันได้เยอะมากเลย","e":[]},{"n":3,"t":"ยางแบนหมดแล้ว","e":[]},{"n":4,"t":"มันให้ความรู้และน่าติดตามมากๆ เลย","e":[]}]},
+{"id":"TGAT_68_p15_q9","s":"TGAT 68","pt":"Part I: Question-Response (Items 1-10)","cv":"","p":15,"q":9,"a":1,"c":[{"n":1,"t":"ไม่ใช่ครับ/ค่ะ ปลายแถวอยู่ทางโน้น","e":[]},{"n":2,"t":"ได้เลย คุณเริ่มใหม่อีกครั้งได้","e":[]},{"n":3,"t":"เชิญตามสบายเลยครับ/ค่ะ","e":[]},{"n":4,"t":"เชิญทำตัวตามสบายเหมือนอยู่บ้านเลยครับ/ค่ะ","e":[]}]},
+{"id":"TGAT_68_p15_q10","s":"TGAT 68","pt":"Part I: Question-Response (Items 1-10)","cv":"","p":15,"q":10,"a":3,"c":[{"n":1,"t":"ไว้ทีหลังก็แล้วกัน","e":[]},{"n":2,"t":"ที่บ้าน","e":[]},{"n":3,"t":"ฉันจะทำการบ้าน","e":[]},{"n":4,"t":"กับเพื่อนๆ ของฉัน","e":[]}]},
+{"id":"TGAT_68_p16_q11","s":"TGAT 68","pt":"Part II: Short Conversations (Items 11-20)","cv":"Conversation 1","p":16,"q":11,"a":2,"c":[{"n":1,"t":"เหมือนฉันสามารถทำอะไรก็ได้ทุกอย่าง","e":[]},{"n":2,"t":"อยู่ภายใต้ความกดดัน (กดดันมาก)","e":[47]},{"n":3,"t":"ภูมิใจในตัวเอง","e":[]},{"n":4,"t":"เบื่อจะตายอยู่แล้ว","e":[26]}]},
+{"id":"TGAT_68_p16_q12","s":"TGAT 68","pt":"Part II: Short Conversations (Items 11-20)","cv":"Conversation 1","p":16,"q":12,"a":3,"c":[{"n":1,"t":"คุณหิวโซขนาดนี้","e":[]},{"n":2,"t":"เขาโกรธคุณ","e":[]},{"n":3,"t":"คุณเครียดมากขนาดนี้","e":[]},{"n":4,"t":"เขาเข้าใจเป็นอย่างดี","e":[]}]},
+{"id":"TGAT_68_p16_q13","s":"TGAT 68","pt":"Part II: Short Conversations (Items 11-20)","cv":"Conversation 1","p":16,"q":13,"a":4,"c":[{"n":1,"t":"ดำเนินต่อไป / เข้ากันได้ดี","e":[]},{"n":2,"t":"เข้าไปใน / เริ่มสนใจ","e":[]},{"n":3,"t":"หนีไป / หลุดพ้น","e":[]},{"n":4,"t":"ผ่านพ้นไปได้","e":[]}]},
+{"id":"TGAT_68_p16_q14","s":"TGAT 68","pt":"Part II: Short Conversations (Items 11-20)","cv":"Conversation 1","p":16,"q":14,"a":3,"c":[{"n":1,"t":"ช่างเถอะ / ยังไงก็ได้","e":[]},{"n":2,"t":"เมื่อไหร่ก็ได้","e":[]},{"n":3,"t":"ด้วยความยินดีเสมอ","e":[]},{"n":4,"t":"ตลอดเวลา","e":[]}]},
+{"id":"TGAT_68_p17_q15","s":"TGAT 68","pt":"Part II: Short Conversations (Items 11-20)","cv":"Conversation 2","p":17,"q":15,"a":1,"c":[{"n":1,"t":"คุณมีอาการปวดนี้มานานแค่ไหนแล้วครับ/คะ?","e":[]},{"n":2,"t":"คุณมาพบทันตแพทย์บ่อยแค่ไหนครับ/คะ?","e":[]},{"n":3,"t":"ช่วงนี้คุณเป็นอย่างไรบ้างครับ/คะ?","e":[]},{"n":4,"t":"ตอนนี้เป็นสัปดาห์ที่เท่าไรแล้วครับ/คะ?","e":[]}]},
+{"id":"TGAT_68_p17_q16","s":"TGAT 68","pt":"Part II: Short Conversations (Items 11-20)","cv":"Conversation 2","p":17,"q":16,"a":3,"c":[{"n":1,"t":"รอสักครู่นะ","e":[45]},{"n":2,"t":"เงียบๆ หน่อย","e":[]},{"n":3,"t":"อ้าปาก","e":[]},{"n":4,"t":"เชิญนั่ง","e":[]}]},
+{"id":"TGAT_68_p17_q17","s":"TGAT 68","pt":"Part II: Short Conversations (Items 11-20)","cv":"Conversation 2","p":17,"q":17,"a":4,"c":[{"n":1,"t":"กรุณาบอกเบอร์โทรศัพท์ของคุณด้วยครับ/ค่ะ","e":[]},{"n":2,"t":"กรุณาหาห้องเองเลยนะครับ/คะ","e":[]},{"n":3,"t":"กรุณาส่งเครื่องมือให้ฉันหน่อยครับ/ค่ะ","e":[]},{"n":4,"t":"กรุณาเดินตามผู้ช่วยของฉันไปที่ห้องถัดไปเลยครับ/ค่ะ","e":[]}]},
+{"id":"TGAT_68_p18_q18","s":"TGAT 68","pt":"Part II: Short Conversations (Items 11-20)","cv":"Conversation 3","p":18,"q":18,"a":1,"c":[{"n":1,"t":"ที่นั่นยอดเยี่ยมมาก!","e":[]},{"n":2,"t":"ฉันไม่เชื่อหรอก!","e":[]},{"n":3,"t":"ฉันไม่สนใจเลยสักนิด","e":[]},{"n":4,"t":"ฉันไม่คิดอย่างนั้นนะ","e":[]}]},
+{"id":"TGAT_68_p18_q19","s":"TGAT 68","pt":"Part II: Short Conversations (Items 11-20)","cv":"Conversation 3","p":18,"q":19,"a":2,"c":[{"n":1,"t":"นั่นอยู่ในละแวกบ้านฉันเอง","e":[]},{"n":2,"t":"ใช่ ฉันเกิดและโตที่นั่นเลย","e":[81]},{"n":3,"t":"ก็ไม่เชิงนะ จะพูดยังไงดีล่ะ...","e":[]},{"n":4,"t":"ขอโทษนะ ฉันยังไม่ค่อยรู้จักทางแถวนี้เลย","e":[]}]},
+{"id":"TGAT_68_p18_q20","s":"TGAT 68","pt":"Part II: Short Conversations (Items 11-20)","cv":"Conversation 3","p":18,"q":20,"a":2,"c":[{"n":1,"t":"ฉันจะขับรถไปส่งคุณที่บ้าน","e":[]},{"n":2,"t":"ฉันจะพาคุณเที่ยวชมรอบๆ","e":[]},{"n":3,"t":"ฉันจะช่วยคุณเก็บกระเป๋า","e":[]},{"n":4,"t":"ฉันจะช่วยหามันให้","e":[]}]},
+{"id":"TGAT_68_p19_q21","s":"TGAT 68","pt":"Part III: Long Conversations (Items 21-30)","cv":"Conversation 1","p":19,"q":21,"a":4,"c":[{"n":1,"t":"กระเป๋าเดินทางของคุณอาจจะอยู่ในเที่ยวบินอื่น","e":[]},{"n":2,"t":"คุณได้ตรวจดูข้างในกระเป๋าเดินทางแล้วหรือยัง?","e":[]},{"n":3,"t":"คุณต้องตรวจสอบรายละเอียดเที่ยวบินของคุณอีกครั้ง","e":[]},{"n":4,"t":"คุณแน่ใจไหมว่าคุณไปรอถูกสายพาน?","e":[]}]},
+{"id":"TGAT_68_p19_q22","s":"TGAT 68","pt":"Part III: Long Conversations (Items 21-30)","cv":"Conversation 1","p":19,"q":22,"a":3,"c":[{"n":1,"t":"หากคุณทำกระเป๋าหาย ลองไปตรวจสอบที่แผนกของหายได้คืนดู","e":[]},{"n":2,"t":"การขึ้นรถไฟด่วนอาจจะดีกว่าสำหรับการขนสัมภาระ","e":[]},{"n":3,"t":"เมื่อเที่ยวบินล่าช้า สัมภาระก็อาจล่าช้าตามไปด้วยได้","e":[]},{"n":4,"t":"การโจรกรรมในสนามบินเกิดขึ้นได้บ้าง แต่ก็ไม่ได้พบบ่อยนัก","e":[]}]},
+{"id":"TGAT_68_p19_q23","s":"TGAT 68","pt":"Part III: Long Conversations (Items 21-30)","cv":"Conversation 1","p":19,"q":23,"a":4,"c":[{"n":1,"t":"ของฝากที่ฉันซื้อให้หลานชาย","e":[]},{"n":2,"t":"เอกสารสำคัญต่างๆ","e":[]},{"n":3,"t":"เงินเก็บทั้งหมดของฉัน","e":[37]},{"n":4,"t":"ของใช้จำเป็นทั้งหมดของฉัน","e":[31]}]},
+{"id":"TGAT_68_p19_q24","s":"TGAT 68","pt":"Part III: Long Conversations (Items 21-30)","cv":"Conversation 1","p":19,"q":24,"a":2,"c":[{"n":1,"t":"มีให้บริการอยู่ในห้องน้ำบนเครื่องบิน","e":[]},{"n":2,"t":"ฉันแนะนำให้ซื้อของเหล่านั้นที่ร้านสะดวกซื้อในสนามบิน","e":[]},{"n":3,"t":"ฉันแนะนำว่าคุณสามารถสั่งซื้อกับฉันได้เลย","e":[]},{"n":4,"t":"ขออภัยด้วย แต่นั่นอยู่นอกเหนือขอบเขตความรับผิดชอบของเรา","e":[]}]},
+{"id":"TGAT_68_p19_q25","s":"TGAT 68","pt":"Part III: Long Conversations (Items 21-30)","cv":"Conversation 1","p":19,"q":25,"a":1,"c":[{"n":1,"t":"เมื่อสัมภาระของคุณมาถึง เราจะแจ้งให้คุณทราบ","e":[]},{"n":2,"t":"เมื่อการจองของคุณได้รับการยืนยัน เราจะแจ้งให้คุณทราบ","e":[]},{"n":3,"t":"ทันทีที่ตารางสัมภาษณ์ของคุณสรุปเรียบร้อย เราจะติดต่อคุณไป","e":[]},{"n":4,"t":"ทันทีที่เที่ยวบินมีการเปลี่ยนกำหนดการ เราจะแจ้งให้คุณทราบ","e":[]}]},
+{"id":"TGAT_68_p20_q26","s":"TGAT 68","pt":"Part III: Long Conversations (Items 21-30)","cv":"Conversation 2","p":20,"q":26,"a":2,"c":[{"n":1,"t":"เขามีลักษณะหน้าตาเป็นอย่างไร?","e":[]},{"n":2,"t":"ที่นั่นมีอะไรน่าตื่นเต้นบ้างไหม?","e":[]},{"n":3,"t":"คุณสนใจในด้านไหนบ้าง?","e":[]},{"n":4,"t":"ฉันไม่ได้บอกคุณเหรอว่าฉันไม่สนใจเลยสักนิด?","e":[]}]},
+{"id":"TGAT_68_p20_q27","s":"TGAT 68","pt":"Part III: Long Conversations (Items 21-30)","cv":"Conversation 2","p":20,"q":27,"a":3,"c":[{"n":1,"t":"พวกเขามี(โซน)เครื่องสำอางใหม่","e":[]},{"n":2,"t":"พวกเขามี(โซน)ชุดชั้นในสตรีใหม่","e":[]},{"n":3,"t":"พวกเขามี(โซน)เสื้อผ้าเครื่องแต่งกายใหม่","e":[]},{"n":4,"t":"พวกเขามี(โซน)ของชำและอาหารสดใหม่","e":[]}]},
+{"id":"TGAT_68_p20_q28","s":"TGAT 68","pt":"Part III: Long Conversations (Items 21-30)","cv":"Conversation 2","p":20,"q":28,"a":3,"c":[{"n":1,"t":"แจกจ่ายออกไป","e":[]},{"n":2,"t":"ยกเรื่องขึ้นมาพูด / เลี้ยงดู","e":[]},{"n":3,"t":"หยิบมา / รับมา","e":[]},{"n":4,"t":"ดำเนินการ / ปฏิบัติ","e":[]}]},
+{"id":"TGAT_68_p20_q29","s":"TGAT 68","pt":"Part III: Long Conversations (Items 21-30)","cv":"Conversation 2","p":20,"q":29,"a":1,"c":[{"n":1,"t":"พวกเขามีแบรนด์ให้เลือกหลากหลายดีไหม","e":[]},{"n":2,"t":"คุณคิดว่าผ้าแบบไหน","e":[]},{"n":3,"t":"คุณช่วยแนะนำอุปกรณ์แกดเจ็ต","e":[]},{"n":4,"t":"มีห้างสรรพสินค้าอื่นอีกไหม","e":[]}]},
+{"id":"TGAT_68_p21_q30","s":"TGAT 68","pt":"Part III: Long Conversations (Items 21-30)","cv":"Conversation 2","p":21,"q":30,"a":4,"c":[{"n":1,"t":"ฉันใช้วันหยุดสุดสัปดาห์หมดไปแล้ว","e":[]},{"n":2,"t":"ฉันจะลองทำอาหารสูตรใหม่สุดสัปดาห์นี้","e":[]},{"n":3,"t":"ฉันยกเลิกแผนวันหยุดสุดสัปดาห์ไปแล้ว","e":[]},{"n":4,"t":"ฉันน่าจะไปสุดสัปดาห์นี้นะ","e":[]}]},
+{"id":"A-Level_68_p21_q1","s":"A-Level 68","pt":"Part I: Short Conversations (items 1 - 12)","cv":"Conversation 1","p":21,"q":1,"a":1,"c":[{"n":1,"t":"ข่าว","e":[]},{"n":2,"t":"เสียง","e":[]},{"n":3,"t":"กีฬา","e":[]},{"n":4,"t":"สภาพอากาศ","e":[]}]},
+{"id":"A-Level_68_p21_q2","s":"A-Level 68","pt":"Part I: Short Conversations (items 1 - 12)","cv":"Conversation 1","p":21,"q":2,"a":4,"c":[{"n":1,"t":"สมัคร","e":[]},{"n":2,"t":"กระโจนเข้าไปใน","e":[]},{"n":3,"t":"ย้ายออกไป","e":[43]},{"n":4,"t":"แต่งงานกับ","e":[]}]},
+{"id":"A-Level_68_p21_q3","s":"A-Level 68","pt":"Part I: Short Conversations (items 1 - 12)","cv":"Conversation 1","p":21,"q":3,"a":3,"c":[{"n":1,"t":"ช่างมันเถอะ!","e":[]},{"n":2,"t":"ระวังตัวนะ!","e":[]},{"n":3,"t":"คุณล้อเล่นใช่ไหม!","e":[]},{"n":4,"t":"ยินดีด้วยนะ!","e":[]}]},
+{"id":"A-Level_68_p22_q4","s":"A-Level 68","pt":"Part I: Short Conversations (items 1 - 12)","cv":"Conversation 1","p":22,"q":4,"a":3,"c":[{"n":1,"t":"ฉันติดตามแน่นอน","e":[]},{"n":2,"t":"ฉันไม่ได้ตั้งใจจะทำแบบนั้น","e":[]},{"n":3,"t":"วัฒนธรรมป๊อปไม่ใช่แนวของฉันเลย","e":[]},{"n":4,"t":"ดนตรีเป็นวิธีผ่อนคลายที่ดี","e":[]}]},
+{"id":"A-Level_68_p22_q5","s":"A-Level 68","pt":"Part I: Short Conversations (items 1 - 12)","cv":"Conversation 2","p":22,"q":5,"a":1,"c":[{"n":1,"t":"คุณเข้าใจประเด็นที่ฉันพูดไหม?","e":[]},{"n":2,"t":"จะถามไปทำไมกัน?","e":[]},{"n":3,"t":"คุณช่วยชี้คำตอบให้หน่อยได้ไหม?","e":[]},{"n":4,"t":"กรุณาพูดให้ตรงประเด็นเลยได้ไหม?","e":[]}]},
+{"id":"A-Level_68_p22_q6","s":"A-Level 68","pt":"Part I: Short Conversations (items 1 - 12)","cv":"Conversation 2","p":22,"q":6,"a":2,"c":[{"n":1,"t":"พูดอีกอย่างก็คือ","e":[]},{"n":2,"t":"ในทางกลับกัน","e":[]},{"n":3,"t":"เหมือนกันเป็นอันหนึ่งอันเดียว","e":[]},{"n":4,"t":"หากจะกล่าวอีกนัยหนึ่ง","e":[]}]},
+{"id":"A-Level_68_p23_q7","s":"A-Level 68","pt":"Part I: Short Conversations (items 1 - 12)","cv":"Conversation 2","p":23,"q":7,"a":2,"c":[{"n":1,"t":"ผู้คนชอบดนตรีแนวไหน?","e":[]},{"n":2,"t":"อาจารย์ชอบดนตรีสไตล์ไหนครับ/คะ?","e":[]},{"n":3,"t":"ดนตรีอะไรที่เป็นที่ชื่นชอบของทุกคน?","e":[]},{"n":4,"t":"ดนตรีสไตล์ไหนที่ทุกคนชื่นชอบ?","e":[]}]},
+{"id":"A-Level_68_p23_q8","s":"A-Level 68","pt":"Part I: Short Conversations (items 1 - 12)","cv":"Conversation 2","p":23,"q":8,"a":3,"c":[{"n":1,"t":"จริง พ่อแม่ทำงานหนักมากเพื่อดูแลลูกๆ","e":[]},{"n":2,"t":"ฉันรู้ ต้องใช้เวลาหลายปีกว่าจะเล่นเครื่องดนตรีให้เก่งได้","e":[]},{"n":3,"t":"ใช่ ตอนฉันยังเด็ก คนรุ่นเก่าก็เกลียดเพลงของฉันเหมือนกัน","e":[]},{"n":4,"t":"แน่นอน การฟังเพลงที่บ้านช่วยให้ครอบครัวใกล้ชิดกันมากขึ้น","e":[]}]},
+{"id":"A-Level_68_p23_q9","s":"A-Level 68","pt":"Part I: Short Conversations (items 1 - 12)","cv":"Conversation 3","p":23,"q":9,"a":2,"c":[{"n":1,"t":"ตอนนี้พวกเราขอพักเลยได้ไหมครับ/คะ?","e":[]},{"n":2,"t":"หนู/ผมขอใช้สไลด์สำหรับงานนี้ได้ไหมครับ/คะ?","e":[]},{"n":3,"t":"คุณครูจะบอกคำตอบที่ถูกต้องให้พวกเราสัปดาห์หน้าไหมครับ/คะ?","e":[]},{"n":4,"t":"พวกเราควรตอบคำถามเป็นประโยคสมบูรณ์ไหมครับ/คะ?","e":[]}]},
+{"id":"A-Level_68_p23_q10","s":"A-Level 68","pt":"Part I: Short Conversations (items 1 - 12)","cv":"Conversation 3","p":23,"q":10,"a":2,"c":[{"n":1,"t":"พวกเราควรทำวิดีโอให้ยาวแค่ไหนครับ/คะ?","e":[]},{"n":2,"t":"หนู/ผมขอใช้อะไรตลกๆ จาก TikTok ได้ไหมครับ/คะ?","e":[]},{"n":3,"t":"สำหรับการนำเสนอ ทุกคนต้องพูดหมดเลยไหมครับ/คะ?","e":[]},{"n":4,"t":"ถ้ากลุ่มของพวกเราไม่ใช้คลิป จะได้คะแนนน้อยลงไหมครับ/คะ?","e":[]}]},
+{"id":"A-Level_68_p24_q11","s":"A-Level 68","pt":"Part I: Short Conversations (items 1 - 12)","cv":"Conversation 3","p":24,"q":11,"a":1,"c":[{"n":1,"t":"ครูไม่ว่าเลยแม้ว่าจะเป็นการ์ตูน แต่ข้อมูลต้องเป็นความจริง","e":[]},{"n":2,"t":"ครูอยากให้พวกเธอสนุกเป็นหลัก ไม่จำเป็นต้องเรียนรู้อะไรเป็นพิเศษหรอก","e":[]},{"n":3,"t":"ใช้เวลาหาข้อมูลหน่อย ถึงแม้ว่ามันจะเห็นได้ชัดว่าเป็นข้อมูลเท็จก็ตาม","e":[]},{"n":4,"t":"จำไว้นะ: หลายเว็บไซต์เป็นของปลอม พวกมันแค่พยายามจะหลอกเอาเงินจากพวกเธอ","e":[]}]},
+{"id":"A-Level_68_p24_q12","s":"A-Level 68","pt":"Part I: Short Conversations (items 1 - 12)","cv":"Conversation 3","p":24,"q":12,"a":3,"c":[{"n":1,"t":"ครูเห็นด้วย การเรียนรู้เป็นเรื่องน่าขำ","e":[]},{"n":2,"t":"ครูคิดว่าเธอต้องปรับปรุงทัศนคติของตัวเองนะ","e":[87]},{"n":3,"t":"ครูดีใจที่ได้ยินแบบนั้น ครูอยากให้พวกเธอสนุกกับการเรียนรู้","e":[]},{"n":4,"t":"ขอบใจที่บอกนะ บางทีนักเรียนคนอื่นอาจจะมีข้อร้องเรียนแบบเดียวกัน","e":[]}]},
+{"id":"A-Level_68_p25_q13","s":"A-Level 68","pt":"Part II: Long Conversation (Items 13 - 20)","cv":"","p":25,"q":13,"a":1,"c":[{"n":1,"t":"ฉันเพิ่งเลิกกับแฟนของฉัน","e":[56]},{"n":2,"t":"พวกเราเพิ่งได้ชมพระอาทิตย์ขึ้นที่สวยงามมากที่นี่","e":[]},{"n":3,"t":"ฉันเพิ่งซื้อเสื้อผ้าใหม่สวยๆ มา","e":[]},{"n":4,"t":"ฉันกับครอบครัวเพิ่งกลับมาจากวันหยุดพักผ่อนที่ยอดเยี่ยม","e":[54]}]},
+{"id":"A-Level_68_p25_q14","s":"A-Level 68","pt":"Part II: Long Conversation (Items 13 - 20)","cv":"","p":25,"q":14,"a":2,"c":[{"n":1,"t":"อย่างไรก็ตาม","e":[]},{"n":2,"t":"อย่างที่เธอคงนึกภาพออก","e":[]},{"n":3,"t":"โดยส่วนใหญ่แล้ว","e":[29]},{"n":4,"t":"เมื่อพิจารณาจากทุกสิ่งทุกอย่างแล้ว","e":[]}]},
+{"id":"A-Level_68_p25_q15","s":"A-Level 68","pt":"Part II: Long Conversation (Items 13 - 20)","cv":"","p":25,"q":15,"a":4,"c":[{"n":1,"t":"กล่าวอีกนัยหนึ่ง","e":[]},{"n":2,"t":"ไม่ต้องบอกก็รู้","e":[67]},{"n":3,"t":"ในทางกลับกัน","e":[]},{"n":4,"t":"อันที่จริงแล้ว","e":[]}]},
+{"id":"A-Level_68_p25_q16","s":"A-Level 68","pt":"Part II: Long Conversation (Items 13 - 20)","cv":"","p":25,"q":16,"a":2,"c":[{"n":1,"t":"เธอก็พูดภาษาอังกฤษได้ดีมากเหมือนกัน","e":[]},{"n":2,"t":"ฉันเลยคิดว่าเธอน่าจะให้คำแนะนำฉันได้บ้าง","e":[]},{"n":3,"t":"บอกฉันหน่อยสิว่าส่วนที่ดีที่สุดของการใช้ชีวิตในประเทศไทยคืออะไร","e":[]},{"n":4,"t":"บางทีเราอาจจะมาเจอกันในช่วงวันหยุดของเราได้นะ","e":[57]}]},
+{"id":"A-Level_68_p25_q17","s":"A-Level 68","pt":"Part II: Long Conversation (Items 13 - 20)","cv":"","p":25,"q":17,"a":3,"c":[{"n":1,"t":"กังวลเกี่ยวกับผลการเรียนของเขา","e":[]},{"n":2,"t":"เบื่อการดูอนิเมะแล้ว","e":[]},{"n":3,"t":"จริงใจต่อความสัมพันธ์ครั้งนี้","e":[]},{"n":4,"t":"อิจฉารถคันใหม่ของเพื่อนเขา","e":[]}]},
+{"id":"A-Level_68_p26_q18","s":"A-Level 68","pt":"Part II: Long Conversation (Items 13 - 20)","cv":"","p":26,"q":18,"a":1,"c":[{"n":1,"t":"บอกฉันหน่อยสิ","e":[]},{"n":2,"t":"พูดกับฉันสิ","e":[]},{"n":3,"t":"คุยกับฉันสิ","e":[]},{"n":4,"t":"พูดคุยกับฉันสิ","e":[]}]},
+{"id":"A-Level_68_p26_q19","s":"A-Level 68","pt":"Part II: Long Conversation (Items 13 - 20)","cv":"","p":26,"q":19,"a":2,"c":[{"n":1,"t":"แนะนำ","e":[]},{"n":2,"t":"สัญญา","e":[]},{"n":3,"t":"กล่าวหา","e":[]},{"n":4,"t":"เคารพ","e":[]}]},
+{"id":"A-Level_68_p26_q20","s":"A-Level 68","pt":"Part II: Long Conversation (Items 13 - 20)","cv":"","p":26,"q":20,"a":3,"c":[{"n":1,"t":"พวกเราโชคดีมากเลย!","e":[]},{"n":2,"t":"เขาคือฝันที่เป็นจริงเลยนะ","e":[80]},{"n":3,"t":"เขาให้แหวนแบบเดียวกันกับพวกเรา","e":[]},{"n":4,"t":"พวกเราควรฉลองด้วยกันนะ","e":[]}]},
+{"id":"TGAT_67_p26_q1","s":"TGAT 67","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":26,"q":1,"a":3,"c":[{"n":1,"t":"ฉันโทรหาแม่เมื่อเช้านี้","e":[]},{"n":2,"t":"ฉันไม่ค่อยได้คุยกับเพื่อนบ่อยนัก","e":[]},{"n":3,"t":"ไม่นะ ฉันชอบการส่งข้อความมากกว่า","e":[]},{"n":4,"t":"ใช่ แทบจะไม่เคยเลย","e":[]}]},
+{"id":"TGAT_67_p26_q2","s":"TGAT 67","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":26,"q":2,"a":3,"c":[{"n":1,"t":"ฉันปวดท้องอย่างหนัก","e":[]},{"n":2,"t":"ฉันคิดว่ามันแพงเกินไป","e":[]},{"n":3,"t":"ฉันประสบอุบัติเหตุทางรถยนต์","e":[]},{"n":4,"t":"ฉันกำลังจะไปดูคอนเสิร์ต","e":[]}]},
+{"id":"TGAT_67_p26_q3","s":"TGAT 67","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":26,"q":3,"a":4,"c":[{"n":1,"t":"มันจะใช้เวลามากกว่า 10 นาที","e":[]},{"n":2,"t":"พวกเขาทั้งหมดออกจากยิมไปแล้ว","e":[]},{"n":3,"t":"รถไฟขบวนถัดไปออกเวลา 11 โมง","e":[]},{"n":4,"t":"เดี๋ยวฉันไปดูให้นะ","e":[]}]},
+{"id":"TGAT_67_p27_q4","s":"TGAT 67","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":27,"q":4,"a":1,"c":[{"n":1,"t":"มีหนังดีๆ ฉายอยู่บ้างไหม","e":[]},{"n":2,"t":"หนังเรื่องนั้นจะฉายนานแค่ไหน","e":[]},{"n":3,"t":"ฉันไม่ชอบหนังสยองขวัญเลยสักนิด","e":[]},{"n":4,"t":"ฉันดูหนังเรื่องนั้นไปแล้ว","e":[]}]},
+{"id":"TGAT_67_p27_q5","s":"TGAT 67","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":27,"q":5,"a":4,"c":[{"n":1,"t":"ฉันอยากมองดูนางแบบ/นายแบบ","e":[]},{"n":2,"t":"มันสวมใส่แล้วแพงกว่า","e":[]},{"n":3,"t":"ฉันสระมันตอนเย็น","e":[]},{"n":4,"t":"มันเป็นแฟชั่นล่าสุด","e":[]}]},
+{"id":"TGAT_67_p27_q6","s":"TGAT 67","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":27,"q":6,"a":2,"c":[{"n":1,"t":"ฉันมักจะไปเที่ยวชมสถานที่และถ่ายรูป","e":[]},{"n":2,"t":"คงจะเป็นหอไอเฟลในกรุงปารีส","e":[]},{"n":3,"t":"การเดินทางคนเดียวสนุกมากสำหรับฉัน","e":[]},{"n":4,"t":"นักท่องเที่ยวจำนวนมากเดินทางมาที่กรุงเทพฯ","e":[]}]},
+{"id":"TGAT_67_p27_q7","s":"TGAT 67","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":27,"q":7,"a":1,"c":[{"n":1,"t":"ทุกสุดสัปดาห์","e":[]},{"n":2,"t":"ในตอนเย็น","e":[]},{"n":3,"t":"หนึ่งหรือสองครั้ง","e":[]},{"n":4,"t":"เป็นเวลาหนึ่งชั่วโมง","e":[]}]},
+{"id":"TGAT_67_p27_q8","s":"TGAT 67","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":27,"q":8,"a":3,"c":[{"n":1,"t":"ท่านทำงานได้ดีมาก","e":[]},{"n":2,"t":"ท่านอยู่ในสำนักงาน","e":[]},{"n":3,"t":"ท่านเกษียณอายุแล้ว","e":[]},{"n":4,"t":"ท่านถูกปรับเงิน","e":[]}]},
+{"id":"TGAT_67_p28_q9","s":"TGAT 67","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":28,"q":9,"a":2,"c":[{"n":1,"t":"ฉันแนะนำรถทัวร์รอบกลางคืน","e":[]},{"n":2,"t":"ประมาณหนึ่งชั่วโมงโดยเครื่องบิน","e":[]},{"n":3,"t":"แค่ 600 กิโลเมตรเท่านั้น","e":[]},{"n":4,"t":"เจ็ด","e":[]}]},
+{"id":"TGAT_67_p28_q10","s":"TGAT 67","pt":"Part I: Question-Response (ข้อ 1–10)","cv":"","p":28,"q":10,"a":4,"c":[{"n":1,"t":"เขาเป็นคนที่เป็นมิตร","e":[]},{"n":2,"t":"เขาชอบวิชาวิทยาศาสตร์","e":[]},{"n":3,"t":"เขาทำคะแนนได้ดี","e":[]},{"n":4,"t":"เขาทำสุนัขหาย","e":[]}]},
+{"id":"TGAT_67_p28_q11","s":"TGAT 67","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 1","p":28,"q":11,"a":3,"c":[{"n":1,"t":"วันนี้ช่างเป็นวันที่ยาวนานจริงๆ!","e":[]},{"n":2,"t":"มันเป็นเรื่องของโชค!","e":[83]},{"n":3,"t":"ช่างน่าประหลาดใจจริงๆ!","e":[]},{"n":4,"t":"หมดเวลาแล้ว!","e":[82]}]},
+{"id":"TGAT_67_p28_q12","s":"TGAT 67","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 1","p":28,"q":12,"a":3,"c":[{"n":1,"t":"คุณชอบมันไหม","e":[]},{"n":2,"t":"คุณเข้าใจที่ฉันพูดไหม","e":[]},{"n":3,"t":"แล้วคุณล่ะ","e":[]},{"n":4,"t":"คุณแน่ใจนะ","e":[]}]},
+{"id":"TGAT_67_p29_q13","s":"TGAT 67","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 1","p":29,"q":13,"a":4,"c":[{"n":1,"t":"ทำไมเราถึงจำเป็นต้อง...","e":[]},{"n":2,"t":"คุณไม่อยากจะ...หรือ","e":[]},{"n":3,"t":"คุณตกลงที่จะ...ไหม","e":[]},{"n":4,"t":"ทำไมเราไม่...กันล่ะ","e":[]}]},
+{"id":"TGAT_67_p29_q14","s":"TGAT 67","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 1","p":29,"q":14,"a":1,"c":[{"n":1,"t":"โทรหาฉันนะ","e":[53]},{"n":2,"t":"อัปเดตเรื่องราวให้ฉันฟังทีหลังนะ","e":[23]},{"n":3,"t":"เข้าแถวสิ","e":[]},{"n":4,"t":"ตรวจสอบดู / เช็กเอาต์","e":[63]}]},
+{"id":"TGAT_67_p29_q15","s":"TGAT 67","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 2","p":29,"q":15,"a":2,"c":[{"n":1,"t":"คุณกำลังจะไป...ด้วยหรือเปล่า","e":[]},{"n":2,"t":"คุณช่วยบอกฉันหน่อยได้ไหมว่า...","e":[]},{"n":3,"t":"ฉันขอพาคุณไปดูได้ไหมว่า...","e":[]},{"n":4,"t":"นี่ใช่ทางไป...ไหม","e":[]}]},
+{"id":"TGAT_67_p29_q16","s":"TGAT 67","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 2","p":29,"q":16,"a":1,"c":[{"n":1,"t":"เดินตรงไปหนึ่งบล็อกจนถึง","e":[]},{"n":2,"t":"ระมัดระวัง","e":[74]},{"n":3,"t":"ออกเดินทาง / บินขึ้นที่","e":[]},{"n":4,"t":"ย้ายออกจาก","e":[75]}]},
+{"id":"TGAT_67_p29_q17","s":"TGAT 67","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 2","p":29,"q":17,"a":4,"c":[{"n":1,"t":"การเดินทางไปไหนมาไหนไม่ค่อยสะดวก","e":[]},{"n":2,"t":"ฉันเคยไปที่นั่นมาก่อนแล้ว","e":[]},{"n":3,"t":"การเดินตามคำบอกทางเป็นเรื่องง่าย","e":[]},{"n":4,"t":"ฉันมาที่นี่เป็นครั้งแรก","e":[]}]},
+{"id":"TGAT_67_p30_q18","s":"TGAT 67","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 3","p":30,"q":18,"a":1,"c":[{"n":1,"t":"มีอาการผิดปกติอะไรบ้างครับ/คะ","e":[]},{"n":2,"t":"คุณมีอาการแพ้อะไรบ้างไหมครับ/คะ","e":[]},{"n":3,"t":"คุณคิดว่าตัวเองป่วยหรือเปล่าครับ/คะ","e":[]},{"n":4,"t":"คุณวินิจฉัยโรคของตัวเองว่าอย่างไรครับ/คะ","e":[]}]},
+{"id":"TGAT_67_p30_q19","s":"TGAT 67","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 3","p":30,"q":19,"a":2,"c":[{"n":1,"t":"คุณเริ่มมี...ตั้งแต่เมื่อไหร่","e":[]},{"n":2,"t":"คุณมี...มานานแค่ไหนแล้ว","e":[]},{"n":3,"t":"คุณเคยมี...มาก่อนไหม","e":[]},{"n":4,"t":"คุณยังคงมี...อยู่ไหม","e":[]}]},
+{"id":"TGAT_67_p30_q20","s":"TGAT 67","pt":"Part II: Short Conversations (ข้อ 11–20)","cv":"Conversation 3","p":30,"q":20,"a":1,"c":[{"n":1,"t":"พักผ่อนให้มากๆ","e":[]},{"n":2,"t":"ไปโรงพยาบาล","e":[]},{"n":3,"t":"จริงจังกับมันหน่อย","e":[40]},{"n":4,"t":"ขอให้สนุกนะ","e":[]}]},
+{"id":"TGAT_67_p31_q21","s":"TGAT 67","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 1","p":31,"q":21,"a":2,"c":[{"n":1,"t":"คุณดู...บ่อยแค่ไหน","e":[]},{"n":2,"t":"คุณได้ดู...หรือยัง","e":[]},{"n":3,"t":"แล้ว...ล่ะเป็นยังไงบ้าง","e":[]},{"n":4,"t":"คุณเห็น...ไหม","e":[]}]},
+{"id":"TGAT_67_p31_q22","s":"TGAT 67","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 1","p":31,"q":22,"a":2,"c":[{"n":1,"t":"มันดูไม่น่าสนใจเลย","e":[]},{"n":2,"t":"มันฟังดูไม่น่าตื่นเต้นเลย","e":[]},{"n":3,"t":"ฉันชอบซีรีส์เกาหลี","e":[]},{"n":4,"t":"ฉันคิดว่ามันตลกดี","e":[]}]},
+{"id":"TGAT_67_p31_q23","s":"TGAT 67","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 1","p":31,"q":23,"a":3,"c":[{"n":1,"t":"มันฉายทางช่องไหนเหรอ","e":[]},{"n":2,"t":"มันฉายกี่โมงเหรอ","e":[]},{"n":3,"t":"เรื่องนี้จบยังไงเหรอ","e":[]},{"n":4,"t":"เขาเป็นยังไงบ้างเหรอ","e":[]}]},
+{"id":"TGAT_67_p31_q24","s":"TGAT 67","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 1","p":31,"q":24,"a":2,"c":[{"n":1,"t":"ตอนละ 30 นาที","e":[]},{"n":2,"t":"ทั้งหมดสิบสองตอน","e":[]},{"n":3,"t":"ทุกวันอาทิตย์","e":[]},{"n":4,"t":"หกชั่วโมง","e":[]}]},
+{"id":"TGAT_67_p31_q25","s":"TGAT 67","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 1","p":31,"q":25,"a":3,"c":[{"n":1,"t":"ฉันอยากดูหนังมาร์เวลสักเรื่องจัง!","e":[]},{"n":2,"t":"เขาทำลายทุกตัวละครเลย","e":[]},{"n":3,"t":"เขาเป็นนักแสดงที่ยอดเยี่ยมมาก!","e":[]},{"n":4,"t":"ฉันขอผ่านดีกว่า","e":[]}]},
+{"id":"TGAT_67_p32_q26","s":"TGAT 67","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 2 (On the phone)","p":32,"q":26,"a":4,"c":[{"n":1,"t":"กรุณารอสักครู่ค่ะ","e":[77]},{"n":2,"t":"กรุณาโทรกลับมาใหม่ภายหลังค่ะ","e":[]},{"n":3,"t":"ฉันชื่อซูซานค่ะ","e":[]},{"n":4,"t":"กำลังพูดอยู่ค่ะ","e":[]}]},
+{"id":"TGAT_67_p32_q27","s":"TGAT 67","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 2 (On the phone)","p":32,"q":27,"a":4,"c":[{"n":1,"t":"ส่งความช่วยเหลือให้ฉัน","e":[]},{"n":2,"t":"ช่วยทำความช่วยเหลือให้ฉัน","e":[]},{"n":3,"t":"มอบความช่วยเหลือให้ฉัน","e":[]},{"n":4,"t":"ช่วยทำอะไรให้ฉันสักอย่าง","e":[61]}]},
+{"id":"TGAT_67_p32_q28","s":"TGAT 67","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 2 (On the phone)","p":32,"q":28,"a":2,"c":[{"n":1,"t":"ช่วยเหลือฉันหน่อย","e":[55,76]},{"n":2,"t":"ขับรถไปส่งฉันหน่อย","e":[78]},{"n":3,"t":"ออกไปขับรถเล่น","e":[]},{"n":4,"t":"ออกไปนั่งรถเล่น","e":[]}]},
+{"id":"TGAT_67_p33_q29","s":"TGAT 67","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 2 (On the phone)","p":33,"q":29,"a":3,"c":[{"n":1,"t":"ไปส่งเธอเดินทาง","e":[88]},{"n":2,"t":"ขับรถไปหาเธอ","e":[25]},{"n":3,"t":"ไปรับเธอ","e":[24]},{"n":4,"t":"ต้อนรับเธอ","e":[]}]},
+{"id":"TGAT_67_p33_q30","s":"TGAT 67","pt":"Part III: Long Conversations (ข้อ 21–30)","cv":"Conversation 2 (On the phone)","p":33,"q":30,"a":3,"c":[{"n":1,"t":"มีปัญหาอะไรหรือเปล่า","e":[]},{"n":2,"t":"เราจะเจอกันได้เมื่อไร","e":[]},{"n":3,"t":"ฉันซาบซึ้งใจจริง ๆ (ขอบคุณมากนะ)","e":[]},{"n":4,"t":"ฉันจะส่งต่อให้","e":[85]}]},
+{"id":"A-Level_67_p33_q1","s":"A-Level 67","pt":"","cv":"Conversation 1 (Situation: Meeting a friend)","p":33,"q":1,"a":2,"c":[{"n":1,"t":"ใช่ ฉันตื่นแต่เช้า","e":[]},{"n":2,"t":"ก็โอเคนะ แต่ฉันง่วงนอนนิดหน่อย","e":[]},{"n":3,"t":"ไม่ แต่เดี๋ยวฉันจะกินอาหารเช้าแล้ว","e":[]},{"n":4,"t":"ขอบใจนะ ฉันรู้สึกดีใจเสมอที่ได้เจอเธอ","e":[]}]},
+{"id":"A-Level_67_p33_q2","s":"A-Level 67","pt":"","cv":"Conversation 1 (Situation: Meeting a friend)","p":33,"q":2,"a":4,"c":[{"n":1,"t":"ก็ไม่เชิงนะ ฉันทำการบ้านตลอดทั้งคืนเลย","e":[]},{"n":2,"t":"ไม่ บางครั้งฉันก็ทำอาหารเย็นกินเอง","e":[]},{"n":3,"t":"ใช่ ฉันไม่เคยตื่นอยู่เกินสี่ทุ่มได้เลย","e":[]},{"n":4,"t":"ใช่ ฉันดูซีรีส์ใน Netflix ตลอดทั้งคืนเลย","e":[]}]},
+{"id":"A-Level_67_p34_q3","s":"A-Level 67","pt":"","cv":"Conversation 1 (Situation: Meeting a friend)","p":34,"q":3,"a":3,"c":[{"n":1,"t":"ตั้งแต่ประมาณ 5 ทุ่มถึงตี 5 ของตอนเช้า","e":[]},{"n":2,"t":"มันใช้เวลาพอ ๆ กับการแข่งฟุตบอลสามนัดเลย","e":[]},{"n":3,"t":"เรื่องราวไซไฟเกี่ยวกับวิธีที่หุ่นยนต์จะเข้ามายึดครองโลก","e":[]},{"n":4,"t":"มันเป็นรายการตลกความยาวสองชั่วโมงเกี่ยวกับสัตว์ตลก ๆ","e":[]}]},
+{"id":"A-Level_67_p34_q4","s":"A-Level 67","pt":"","cv":"Conversation 1 (Situation: Meeting a friend)","p":34,"q":4,"a":3,"c":[{"n":1,"t":"จริงเหรอ มันเป็นเรื่องเกี่ยวกับอะไรล่ะ","e":[]},{"n":2,"t":"ดีเลย ลองค้นหาชื่อเรื่อง “Am I AI?” ดูสิ","e":[]},{"n":3,"t":"ฉันก็เหมือนกัน แต่ฉันหลงใหลในเรื่องเทคโนโลยีด้วยน่ะ","e":[]},{"n":4,"t":"ไม่มีปัญหา เดี๋ยวสุดสัปดาห์นี้เราดูด้วยกันก็ได้","e":[]}]},
+{"id":"A-Level_67_p34_q5","s":"A-Level 67","pt":"","cv":"Conversation 2 (Situation: At a coffee shop)","p":34,"q":5,"a":2,"c":[{"n":1,"t":"เยี่ยมเลย เดี๋ยวฉันเล่าให้เธอฟังเอง","e":[]},{"n":2,"t":"เอาน่า พวกเราเป็นเพื่อนกันนะ พูดมาเถอะ","e":[]},{"n":3,"t":"ฉันรู้ว่าเธอเริ่มทำตอนที่ฉันไม่อยู่","e":[]},{"n":4,"t":"ไม่เป็นไร ฉันไม่ได้อยากคุยเรื่องนั้นหรอก","e":[]}]},
+{"id":"A-Level_67_p34_q6","s":"A-Level 67","pt":"","cv":"Conversation 2 (Situation: At a coffee shop)","p":34,"q":6,"a":4,"c":[{"n":1,"t":"อะไรนะ ฉันสัญญาแล้วว่าจะไม่เอาเรื่องนั้นไปคุยกับใคร","e":[]},{"n":2,"t":"ฉันไม่ชอบเวลาที่คนเราไม่รักษาสัญญา","e":[]},{"n":3,"t":"เธอเคยผิดสัญญาแล้วรู้สึกแย่บ้างไหม","e":[]},{"n":4,"t":"ฉันจะสัญญาได้ยังไงในเมื่อยังไม่รู้เลยว่าเธอกำลังพูดถึงเรื่องอะไร","e":[]}]},
+{"id":"A-Level_67_p35_q7","s":"A-Level 67","pt":"","cv":"Conversation 2 (Situation: At a coffee shop)","p":35,"q":7,"a":4,"c":[{"n":1,"t":"ฉันโกรธเพราะเธอกำลังโกหกฉันอยู่","e":[]},{"n":2,"t":"พูดตามตรงนะ ฉันไม่รู้ว่าทำไมเธอถึงโกรธ","e":[]},{"n":3,"t":"ใช่ ฉันโกรธ ฉันไม่อยากบอกความจริงกับเธอ","e":[]},{"n":4,"t":"เปล่า ฉันไม่ได้โกรธ ฉันแค่อยากให้เธอซื่อสัตย์กับฉันเท่านั้นเอง","e":[]}]},
+{"id":"A-Level_67_p35_q8","s":"A-Level 67","pt":"","cv":"Conversation 2 (Situation: At a coffee shop)","p":35,"q":8,"a":3,"c":[{"n":1,"t":"พูดตามตรงนะ ฉันอยากเป็นซูเปอร์สตาร์","e":[]},{"n":2,"t":"ใช่ นั่นแหละเหตุผลที่เธอควรพูดความจริงกับฉัน","e":[]},{"n":3,"t":"แต่ความซื่อสัตย์ก็สามารถทำให้มิตรภาพแน่นแฟ้นขึ้นได้เหมือนกันนะ","e":[]},{"n":4,"t":"โอ้ ไม่ต้องห่วงเรื่องนั้นหรอก เดี๋ยวเรามาเป็นเพื่อนกันได้","e":[]}]},
+{"id":"A-Level_67_p35_q9","s":"A-Level 67","pt":"","cv":"Conversation 3 (Situation: At a clothes store)","p":35,"q":9,"a":2,"c":[{"n":1,"t":"เธอชอบสีไหนมากกว่ากัน","e":[]},{"n":2,"t":"ปกติเธอใส่ไซส์อะไร","e":[]},{"n":3,"t":"เธอไปช้อปปิ้งซื้อเสื้อผ้าบ่อยแค่ไหน","e":[]},{"n":4,"t":"เธอหาซื้อเสื้อผ้าสไตล์ที่ชอบได้จากที่ไหน","e":[]}]},
+{"id":"A-Level_67_p35_q10","s":"A-Level 67","pt":"","cv":"Conversation 3 (Situation: At a clothes store)","p":35,"q":10,"a":4,"c":[{"n":1,"t":"โอเค อย่างที่ฉันพูดเสมอว่า “มาง่ายก็ไปง่าย”","e":[]},{"n":2,"t":"เธอรู้ไหมว่าเขาว่ากันว่า “ไม่มีความเจ็บปวดย่อมไม่มีความสำเร็จ”","e":[79]},{"n":3,"t":"ฉันไม่สนหรอกว่ามันจะดูเป็นยังไง ฉันแค่อยากได้อะไรที่ใส่สบาย","e":[]},{"n":4,"t":"แน่ใจเหรอ ไม่คิดเหรอว่ามันจะดูเหมือนฉันใส่เสื้อตัวใหญ่เกินไป","e":[]}]},
+{"id":"A-Level_67_p36_q11","s":"A-Level 67","pt":"","cv":"Conversation 3 (Situation: At a clothes store)","p":36,"q":11,"a":3,"c":[{"n":1,"t":"พูดเรื่องอะไรน่ะ ตัวใหญ่นี่แหละดูดีจะตาย!","e":[]},{"n":2,"t":"ถูกต้อง มันก็แค่เรื่องของความมั่นใจในตัวเอง ใช่ไหมล่ะ","e":[]},{"n":3,"t":"นั่นสิ ฉันคงไม่มีวันรู้หรอก เพราะคงไม่มีใครมาสนใจฉันแน่ ๆ","e":[]},{"n":4,"t":"ทุกคนต่างก็มีเสน่ห์ในแบบของตัวเอง จริงไหมล่ะ","e":[39]}]},
+{"id":"A-Level_67_p36_q12","s":"A-Level 67","pt":"","cv":"Conversation 3 (Situation: At a clothes store)","p":36,"q":12,"a":3,"c":[{"n":1,"t":"ตอนนี้ฉันกำลังลดน้ำหนักอยู่ และน้ำหนักลดลงมากเกินไปแล้ว","e":[]},{"n":2,"t":"ก็คิดบ้างนะ แต่ฉันคิดว่าฉันควรเพิ่มน้ำหนักอีกสักหน่อย","e":[]},{"n":3,"t":"ฮ่า! ทุกครั้งที่ฉันลดน้ำหนัก น้ำหนักฉันกลับเพิ่มขึ้นทุกทีเลย!","e":[]},{"n":4,"t":"ใช่ ตอนนี้ฉันกำลังคุมอาหารอยู่ แต่เสื้อผ้าของฉันกลับหลวมเกินไปหมดแล้ว","e":[]}]},
+{"id":"A-Level_67_p37_q13","s":"A-Level 67","pt":"","cv":"Situation: In the teacher's office at school","p":37,"q":13,"a":3,"c":[{"n":1,"t":"จริงเหรอคะ โอเคค่ะ หนูควรพยายามทำให้ดีกว่านี้ในอนาคตไหมคะ","e":[]},{"n":2,"t":"หนูคิดว่าเป็นเพราะหนูมีการบ้านวิชาอื่นเยอะเกินไปค่ะ","e":[]},{"n":3,"t":"หนูทราบค่ะ คุณครูให้เกรด “A” กับหนูในงานทุกชิ้นเลย","e":[]},{"n":4,"t":"โอ้ หนูไม่รู้มาก่อนเลยค่ะ มีตรงไหนที่หนูควรปรับปรุงไหมคะ","e":[]}]},
+{"id":"A-Level_67_p37_q14","s":"A-Level 67","pt":"","cv":"Situation: In the teacher's office at school","p":37,"q":14,"a":1,"c":[{"n":1,"t":"เธอได้ให้ใครช่วยทำการบ้านบ้างหรือเปล่า","e":[]},{"n":2,"t":"งานที่ครูสั่งเขียนยากหรือง่ายสำหรับเธอ","e":[]},{"n":3,"t":"เธอใช้เวลาเยอะไหมในการทำงานที่ครูมอบหมายให้","e":[]},{"n":4,"t":"เธอคิดว่าเธอควรจะได้เกรดดี ๆ จากการทำการบ้านไหม","e":[]}]},
+{"id":"A-Level_67_p37_q15","s":"A-Level 67","pt":"","cv":"Situation: In the teacher's office at school","p":37,"q":15,"a":4,"c":[{"n":1,"t":"เธอเขียนทุกอย่างด้วยตัวเองหรือเปล่า","e":[]},{"n":2,"t":"เธอช่วยเพื่อนนักเรียนคนอื่นเขียนงานของพวกเขาหรือเปล่า","e":[]},{"n":3,"t":"เธอบอกครูได้ไหมว่าเธอเขียนการบ้านยังไง","e":[]},{"n":4,"t":"เธอได้คัดลอกอะไรมาจากเว็บไซต์แล้วเอามาวางในงานเขียนของเธอหรือเปล่า","e":[]}]},
+{"id":"A-Level_67_p37_q16","s":"A-Level 67","pt":"","cv":"Situation: In the teacher's office at school","p":37,"q":16,"a":3,"c":[{"n":1,"t":"หนูไม่ได้หมายความแบบนั้นค่ะ","e":[]},{"n":2,"t":"ว้าว คุณครูไม่รู้คำนั้นเหรอคะ","e":[]},{"n":3,"t":"ขอโทษค่ะ หนูไม่รู้จักคำนั้นค่ะ","e":[]},{"n":4,"t":"ห๊ะ คุณครูหมายความว่ายังไงคะ","e":[]}]},
+{"id":"A-Level_67_p37_q17","s":"A-Level 67","pt":"","cv":"Situation: In the teacher's office at school","p":37,"q":17,"a":4,"c":[{"n":1,"t":"ค่ะ หนูส่งไปตอนต้นคาบเรียนแล้วค่ะ","e":[41]},{"n":2,"t":"ไม่ค่ะ คำนั้นไม่ใช่คำที่ถูกต้องสำหรับประโยคนั้น","e":[]},{"n":3,"t":"หนูไม่ทราบค่ะ บางทีหนูอาจจะทำการบ้านผิดวิชาให้คุณครูก็ได้","e":[]},{"n":4,"t":"เอ่อ บางทีหนูอาจจะเปิดพจนานุกรมใช้ค่ะ แต่ตอนนี้ลืมความหมายไปแล้ว","e":[]}]},
+{"id":"A-Level_67_p37_q18","s":"A-Level 67","pt":"","cv":"Situation: In the teacher's office at school","p":37,"q":18,"a":4,"c":[{"n":1,"t":"ได้ค่ะ เดี๋ยวคืนนี้หนูเขียนเรื่องนั้นใหม่เป็นการบ้านได้ค่ะ","e":[]},{"n":2,"t":"ไม่ค่ะ หนูไม่คิดว่าน้ำท่วมจะเป็นผลดีต่อสิ่งแวดล้อมนะคะ","e":[]},{"n":3,"t":"ได้เลยค่ะ การรีไซเคิลเป็นสิ่งสำคัญในการลดมลพิษจากพลาสติกค่ะ","e":[]},{"n":4,"t":"เอ่อ จริง ๆ แล้วหนูขอเวลาคิดทบทวนเรื่องนั้นสักหน่อยนะคะ","e":[]}]},
+{"id":"A-Level_67_p38_q19","s":"A-Level 67","pt":"","cv":"Situation: In the teacher's office at school","p":38,"q":19,"a":4,"c":[{"n":1,"t":"เรียงความของเธอสับสนมากเลยนะ ครูคงต้องอธิบายให้เธอฟังอีกรอบ","e":[]},{"n":2,"t":"เธอพูดถูก มันซับซ้อนมากและไม่สามารถอธิบายทางวิทยาศาสตร์ได้","e":[]},{"n":3,"t":"ในมุมมองของครู ครูคิดว่าเธอควรเลิกส่งการบ้านสายขนาดนี้ได้แล้ว","e":[]},{"n":4,"t":"ดูเหมือนว่าเธอไม่ได้ใช้คำพูดของตัวเองเขียนงานที่ได้รับมอบหมายเลยนะ","e":[]}]},
+{"id":"A-Level_67_p38_q20","s":"A-Level 67","pt":"","cv":"Situation: In the teacher's office at school","p":38,"q":20,"a":2,"c":[{"n":1,"t":"เยี่ยมเลย! รักษามาตรฐานที่ดีนี้ไว้ แล้วเธอจะเป็นคนเก่งที่สุดในห้องเลย!","e":[38]},{"n":2,"t":"โอเค ถือว่าการคุยกันครั้งนี้เป็นคำเตือนนะ ถ้ามีอีกครั้งหน้า เธอจะได้เกรด “F”","e":[]},{"n":3,"t":"นั่นแหละที่ครูคิดไว้เลย ช่วยสอนเพื่อนร่วมชั้นให้ทำแบบเดียวกันด้วยนะ","e":[]},{"n":4,"t":"ลองคัดลอกจากเว็บไซต์อื่น ๆ เพิ่มดูสิ แล้วงานเขียนของเธอจะได้ดูแปลกใหม่ไม่ซ้ำใคร","e":[]}]}
+];
+    const EXTRAS = [
+{"kp":1,"tp":"Don't worry","cr":"Extra ข้อ 1 หน้า 1 ตัวเลือกที่ 3","qid":"TGAT_68_p14_q1","loc":"TGAT 68 / หน้า 14 / ข้อ 1 / ตัวเลือก 2","st":"คลาดเคลื่อน (แก้ตำแหน่ง)","nt":"หน้า Extra ระบุ 'ข้อ 1 หน้า 1 ตัวเลือกที่ 3' (ซึ่งหน้า 1 ข้อ 1 ตัวเลือก 3 คือ 'It was raining yesterday afternoon.') ตัวเลือกที่ตรงกับ 'Don't worry.' คือ TGAT 68 หน้า 14 ข้อ 1 ตัวเลือกที่ 2 (หมายเหตุ: หน้า 35 ข้อ 8 ตัวเลือก 4 มีวลี 'don't worry about that' และหน้า 1 ข้อ 2 ตัวเลือก 4 คือ 'Don't sweat it!' ซึ่งมีหน้า Extra แยกที่หน้า 72)","syn":["No worries.","All good.","No big deal.","No problem","It's under control.","I've got this.","Take it easy."]},
+{"kp":2,"tp":"Take it with a grain of salt","cr":"Extra ข้อ 30 หน้า 8 ตัวเลือกที่ 4","qid":"TGAT_69_p8_q30","loc":"TGAT 69 / หน้า 8 / ข้อ 30 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["Don't jump to conclusions","Verify the information","Keep an open mind","Think critically","Be skepitcal"]},
+{"kp":3,"tp":"Play it by ear","cr":"Extra ข้อ 8 หน้า 2 ตัวเลือกที่ 4","qid":"TGAT_69_p2_q8","loc":"TGAT 69 / หน้า 2 / ข้อ 8 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["See how things go","Make it up as you go along","Take things as they come","Cross that bridge when you come to it","Wait and see"]},
+{"kp":4,"tp":"Every clound has a silver lining","cr":"Extra ข้อ 1 หน้า 1 ตัวเลือกที่ 2","qid":"TGAT_69_p1_q1","loc":"TGAT 69 / หน้า 1 / ข้อ 1 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["After rain come sunshine","Ever storm runs out of rain","Look on the bright side","There is a light at the end of the tunnel","It's always darkest before the down"]},
+{"kp":5,"tp":"OUT OF THE BLUE","cr":"Extra ข้อ18 หน้า13 ตัวเลือกที่2","qid":"A-Level_69_p13_q18","loc":"A-Level 69 / หน้า 13 / ข้อ 18 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["Without prior warning","Come as a bolt from the blue","Without the slightest forewar","Catch someone off guard","Out of nowhere"]},
+{"kp":6,"tp":"ALL IN DUE TIME","cr":"Extra ข้อ16 หน้า13 ตัวเลือกที่3","qid":"A-Level_69_p13_q16","loc":"A-Level 69 / หน้า 13 / ข้อ 16 / ตัวเลือก 3","st":"ตรงตามหน้า Extra","nt":"","syn":["At the appropriate juncture","In the fullness of time","When the time is ripe","Everything has its appointed","In due course"]},
+{"kp":7,"tp":"Cut to the shase","cr":"Extra ข้อ 30 หน้า 8 ตัวเลือกที่ 2","qid":"TGAT_69_p8_q30","loc":"TGAT 69 / หน้า 8 / ข้อ 30 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["Come straight to the point","Get down to business","Don't beat around the bush","Skip the details","Let's get to the main point"]},
+{"kp":8,"tp":"SAVE FOR A RAINY DAY","cr":"Extra ข้อ12 หน้า11 ตัวเลือกที่1","qid":"A-Level_69_p11_q12","loc":"A-Level 69 / หน้า 11 / ข้อ 12 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["Put something aside","Accumulate a contingency fund","Keep something in reserve","Amass a financial cushion","Build up a nest egg"]},
+{"kp":9,"tp":"Get your hopes up","cr":"Extra ข้อ 27 หน้า 7 ตัวเลือกที่ 4","qid":"TGAT_69_p7_q27","loc":"TGAT 69 / หน้า 7 / ข้อ 27 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["Look forward to","Be optimistic","Have high hopes","Expect the best","Get excited about"]},
+{"kp":10,"tp":"Throw in the towel","cr":"Extra ข้อ 29 หน้า 8 ตัวเลือกที่ 4","qid":"TGAT_69_p8_q29","loc":"TGAT 69 / หน้า 8 / ข้อ 29 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["Admit defeat and walk away","Stop fighting for something","Accept that you have lost","Decide that enough is enough","Walk away from a difficul situation"]},
+{"kp":11,"tp":"my cup of tea","cr":"Extra ข้อ 17 หน้าที่ 5 ตัวเลือกที่ 1","qid":"TGAT_69_p5_q17","loc":"TGAT 69 / หน้า 5 / ข้อ 17 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["Right up my alley","My thing","To my liking","Right down my street","To one's taste","To my taste."]},
+{"kp":12,"tp":"Keep your chin up","cr":"Extra ข้อ 28 หน้า 7 ตัวเลือกที่ 3","qid":"TGAT_69_p7_q28","loc":"TGAT 69 / หน้า 7 / ข้อ 28 / ตัวเลือก 3","st":"ตรงตามหน้า Extra","nt":"","syn":["Stay strong","Don't give up","keep going","stay positive","cheer up","Hang in there"]},
+{"kp":13,"tp":"cut corners","cr":"Extra ข้อ 28 หน้า 7 ตัวเลือกที่ 1","qid":"TGAT_69_p7_q28","loc":"TGAT 69 / หน้า 7 / ข้อ 28 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["Take shortcuts","Skip steps","Take the easy way out","Skimp on quality","Save time"]},
+{"kp":14,"tp":"break the ice","cr":"Extra ข้อ 28 หน้า 7 ตัวเลือกที่ 2","qid":"TGAT_69_p7_q28","loc":"TGAT 69 / หน้า 7 / ข้อ 28 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["Start a conversation","Make friends","Ease the tension","Make someone feel comfortable","Get to know someone"]},
+{"kp":15,"tp":"It's raining cats and dog","cr":"Extra ข้อ 12 หน้า 11 ตัวเลือกที่ 3.","qid":"A-Level_69_p11_q12","loc":"A-Level 69 / หน้า 11 / ข้อ 12 / ตัวเลือก 3","st":"ตรงตามหน้า Extra","nt":"","syn":["It's pouring","It's raing buckets","It's lashing","It's pissing it down","The rain is coming down in sheets"]},
+{"kp":16,"tp":"go with the flow","cr":"Extra ข้อ 15 หน้า 13 ตัวเลือกที่ 3","qid":"A-Level_69_p12_q15","loc":"A-Level 69 / หน้า 12 / ข้อ 15 / ตัวเลือก 3","st":"คลาดเคลื่อน (หน้าข้ามหน้า)","nt":"หน้า Extra ระบุ 'หน้า 13' เพราะตัวเลือกที่ 3–4 ของข้อ 15 ล้นไปอยู่บนหน้า 13 แต่เลขข้อ 15 เริ่มต้นที่หน้า 12 (A-Level 69 หน้า 12 ข้อ 15 ตัวเลือกที่ 3)","syn":["play it by ear","Take it easy","Roll with the punches","Let it be","Whatever happens"]},
+{"kp":17,"tp":"give it a shot","cr":"Extra ข้อ 30 หน้า 8 ตัวเลือกที่ 1.","qid":"TGAT_69_p8_q30","loc":"TGAT 69 / หน้า 8 / ข้อ 30 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["give it a try","give it a go","try it out","take a leap","give it a whirl","take a chance"]},
+{"kp":18,"tp":"MIND YOUR OWN BUSINESS","cr":"• Extra ข้อ 15 ตัวเลือกที่ 4 หน้า 13","qid":"A-Level_69_p12_q15","loc":"A-Level 69 / หน้า 12 / ข้อ 15 / ตัวเลือก 4","st":"คลาดเคลื่อน (หน้าข้ามหน้า)","nt":"หน้า Extra ระบุ 'หน้า 13' เพราะตัวเลือกที่ 3–4 ของข้อ 15 ล้นไปอยู่บนหน้า 13 แต่เลขข้อ 15 เริ่มต้นที่หน้า 12 (A-Level 69 หน้า 12 ข้อ 15 ตัวเลือกที่ 4)","syn":["keep your nose out of it.","butt out.","get off my back.","Not your circus,not your monkeys.","stay in your lane"]},
+{"kp":19,"tp":"DRAW THE LINE","cr":"• Extra ข้อ 29 ตัวเลือกที่ 2 หน้า 8","qid":"TGAT_69_p8_q29","loc":"TGAT 69 / หน้า 8 / ข้อ 29 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["put one's foot down.","enough is enough.","that's a dealbreake.","know your limits.","set bounderies."]},
+{"kp":20,"tp":"take things for granted","cr":"Extra ข้อ 28 หน้า 7 ตัวเลือกที่ 4","qid":"TGAT_69_p7_q28","loc":"TGAT 69 / หน้า 7 / ข้อ 28 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["Fail to appreciate","Take for granted","Underestimate the value of","Overlook the worth of","Not appreciate what you have"]},
+{"kp":21,"tp":"I'M FEELING UNDER THE WEATHER","cr":"• Extra ข้อ 4 ตัวเลือกที่ 4 หน้า 14","qid":"TGAT_68_p14_q4","loc":"TGAT 68 / หน้า 14 / ข้อ 4 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["i'm feeling a bit off.","I'm running on empty.","I'm out of sorts.","I'm off-color.","I'm not up to par"]},
+{"kp":22,"tp":"enhace the taste","cr":"Extra ข้อ 3 หน้า 9 ตัวเลือกที่","qid":"A-Level_69_p9_q3","loc":"A-Level 69 / หน้า 9 / ข้อ 3 / ตัวเลือก 2","st":"ระบุข้อมูลไม่ครบ (เติมตัวเลือก)","nt":"หน้า Extra เว้นว่างหลังคำว่า 'ตัวเลือกที่' และพิมพ์ 'enhace' — ตรงกับ A-Level 69 หน้า 9 ข้อ 3 ตัวเลือกที่ 2 ('the chef will enhance the taste.')","syn":["Improve the flavor","Bring out the flavor","Add flavor","Enrich the taste","Boost the flavor"]},
+{"kp":23,"tp":"at any rate","cr":"Extra ข้อ 16 หน้า 13 ตัวเลือกที่ 1","qid":"A-Level_69_p13_q16","loc":"A-Level 69 / หน้า 13 / ข้อ 16 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["Anyway","In any case","At least","Regardless","Be that as it may"]},
+{"kp":24,"tp":"catch me up","cr":"Extra ข้อ 14 หน้าที่ 29 ตัวเลือกที่ 2","qid":"TGAT_67_p29_q14","loc":"TGAT 67 / หน้า 29 / ข้อ 14 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["fill me in","Bring me up to speed","update me","Loop me in","give me the rundown"]},
+{"kp":25,"tp":"Pick you up","cr":"Extra ข้อ 29 หน้าที่ 33 ตัวเลือกที่ 3","qid":"TGAT_67_p33_q29","loc":"TGAT 67 / หน้า 33 / ข้อ 29 / ตัวเลือก 3","st":"ตรงตามหน้า Extra","nt":"","syn":["come get you","collect you","give you a ride","swing by and get you","Fetch you"]},
+{"kp":26,"tp":"drive to you","cr":"Extra ข้อ 29 หน้าที่ 33 ตัวเลือกที่ 2","qid":"TGAT_67_p33_q29","loc":"TGAT 67 / หน้า 33 / ข้อ 29 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["swing by","on my way to you","come to you","Head your way","Drive over to your place"]},
+{"kp":27,"tp":"bored to death.","cr":"Extra ข้อ11หน้า 16ตัวเลือกที่4","qid":"TGAT_68_p16_q11","loc":"TGAT 68 / หน้า 16 / ข้อ 11 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["Bored to tears.","Bored stiff.","Die of boredom.","Bored out one's mind.","Worn up."]},
+{"kp":28,"tp":"It's my pleasure.","cr":"Extra ข้อ4หน้า 1 ตัวเลือกที่1","qid":"TGAT_69_p1_q4","loc":"TGAT 69 / หน้า 1 / ข้อ 4 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["The pleasure is all mine.","You're very welcome.","Always happy to help.","The pleasure is all mine.","Glad to be of service."]},
+{"kp":29,"tp":"seize the chance","cr":"Extra ข้อ24 หน้า 6 ตัวเลือกที่4","qid":"TGAT_69_p6_q24","loc":"TGAT 69 / หน้า 6 / ข้อ 24 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["grab the chance.","watch the chance.","grasp the chance.","Seize the day.","Carpe the opportunity.","Grab the bull by the horns."]},
+{"kp":30,"tp":"More often than not","cr":"Extra ข้อ 14 หน้า 25 ตัวเลือกที่ 3","qid":"A-Level_68_p25_q14","loc":"A-Level 68 / หน้า 25 / ข้อ 14 / ตัวเลือก 3","st":"ตรงตามหน้า Extra","nt":"","syn":["Most of the time","More times than not","In most cases","Usually","Generally","As a rule"]},
+{"kp":31,"tp":"to spell it out","cr":"Extra ข้อ11 หน้า 11 ตัวเลือกที่1","qid":"A-Level_69_p11_q11","loc":"A-Level 69 / หน้า 11 / ข้อ 11 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["Make it clear","Explain explicitly","Put it simply","Clarify","Lay it out","Be specific","Put it plainly"]},
+{"kp":32,"tp":"All my essential","cr":"Extra ข้อ 23 หน้า19 ตัวเลือกที่4","qid":"TGAT_68_p19_q23","loc":"TGAT 68 / หน้า 19 / ข้อ 23 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["All I Need","My Everything","My Essentials","Everything That Matters","My Necessities","My Whole World"]},
+{"kp":33,"tp":"At the end of the day,","cr":"Extra ข้อ18 หน้า13 ตัวเลือกที่4","qid":"A-Level_69_p13_q18","loc":"A-Level 69 / หน้า 13 / ข้อ 18 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["Ultimately","In essence","When all is said and done","All things considered","In the long run"]},
+{"kp":34,"tp":"At all events,","cr":"Extra ข้อ18 หน้า13 ตัวเลือกที่1","qid":"A-Level_69_p13_q18","loc":"A-Level 69 / หน้า 13 / ข้อ 18 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["In any case","At any rate","No matter what","Regardless","Come what may"]},
+{"kp":35,"tp":"TAKE IT OR LEAVE IT","cr":"EXTRA ข้อ18 ตัวเลือกที่3 หน้า13","qid":"A-Level_69_p13_q18","loc":"A-Level 69 / หน้า 13 / ข้อ 18 / ตัวเลือก 3","st":"ตรงตามหน้า Extra","nt":"","syn":["An ultimatum","Accept or decline","A final and irrevocable offer","No room for negotiation","A non-negotiable offer"]},
+{"kp":36,"tp":"Stick to the point","cr":"Extra ข้อ15 หน้า12 ตัวเลือกที่2","qid":"A-Level_69_p12_q15","loc":"A-Level 69 / หน้า 12 / ข้อ 15 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["Get to the point","Cut to the chase","Don't beat around the bush","Stay on topic","Keep on track"]},
+{"kp":37,"tp":"WHEN IT RAINS,IT POURS","cr":"EXTRA ข้อ12 ตัวเลือกที่2 หน้า11","qid":"A-Level_69_p11_q12","loc":"A-Level 69 / หน้า 11 / ข้อ 12 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["Misfortunes never come singly","A string of unfortunate events","One thing after another","A succession of setbacks","A series of calamities"]},
+{"kp":38,"tp":"ALL MY SAVINGS","cr":"EXTRA ข้อ23 ตัวเลือกที่3 หน้า19","qid":"TGAT_68_p19_q23","loc":"TGAT 68 / หน้า 19 / ข้อ 23 / ตัวเลือก 3","st":"ตรงตามหน้า Extra","nt":"","syn":["Accumulated wealth","Total accumulated cap","Entire nest egg","Life savings","Monetary reserves"]},
+{"kp":39,"tp":"KEEP UP THE GOOD WORK","cr":"Extra ข้อ 20 ตัวเลือกที่ 1 หน้า 38","qid":"A-Level_67_p38_q20","loc":"A-Level 67 / หน้า 38 / ข้อ 20 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["keep it up.","well done, carry on.","don't stop now.","keep going strong.","continue the great job."]},
+{"kp":40,"tp":"IN THEIR OWN WAY","cr":"Extra ข้อ 11 ตัวเลือกที่ 4","qid":"A-Level_67_p36_q11","loc":"A-Level 67 / หน้า 36 / ข้อ 11 / ตัวเลือก 4","st":"ระบุข้อมูลไม่ครบ (เติมหน้า)","nt":"หน้า Extra ไม่ได้ระบุเลขหน้า — ตรงกับ A-Level 67 หน้า 36 ข้อ 11 ตัวเลือกที่ 4 ('Everybody is attractive in their own way, don't you think?')","syn":["in their own style.","uniquely.","in a way that is their own.","each in a different way."]},
+{"kp":41,"tp":"Take it seriously","cr":"Extra ข้อ 20 หน้าที่ 30 ตัวเลือกที่ 3","qid":"TGAT_67_p30_q20","loc":"TGAT 67 / หน้า 30 / ข้อ 20 / ตัวเลือก 3","st":"ตรงตามหน้า Extra","nt":"","syn":["Pay close attention to ...","Get serious about ...","Stop messing around","Put one's mind to ...","Not to be trifled with ..."]},
+{"kp":42,"tp":"HANDED IT IN","cr":"Extra ข้อ 17 ตัวเลือกที่ 1 หน้า 37","qid":"A-Level_67_p37_q17","loc":"A-Level 67 / หน้า 37 / ข้อ 17 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["submitted it.","turned it in.","gave it in.","delivered it.","presented it."]},
+{"kp":43,"tp":"It's convenient","cr":"Extra ข้อ 5 หน้าที่ 14 ตัวเลือกที่ 4","qid":"TGAT_68_p14_q5","loc":"TGAT 68 / หน้า 14 / ข้อ 5 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["It's handy","It's user-friendly","It's practical","It's hassle-free","It's effortless"]},
+{"kp":44,"tp":"Move away","cr":"หน้าที่ 21 ข้อที่ 2 ตัวเลือกที่ 3","qid":"A-Level_68_p21_q2","loc":"A-Level 68 / หน้า 21 / ข้อ 2 / ตัวเลือก 3","st":"ตรงตามหน้า Extra","nt":"","syn":["Pivot","stand aloof","Withdraw","Recede","Avert"]},
+{"kp":45,"tp":"Prioritized","cr":"หน้าที่ 9 ข้อที่ 3 ตัวเลือกที่ 3","qid":"A-Level_69_p9_q3","loc":"A-Level 69 / หน้า 9 / ข้อ 3 / ตัวเลือก 3","st":"ตรงตามหน้า Extra","nt":"","syn":["Featured","Emphasized","Favored","Streamlined","Categorized"]},
+{"kp":46,"tp":"Give me a second","cr":"Extra ข้อ16 หน้า17 ตัวเลือกที่1","qid":"TGAT_68_p17_q16","loc":"TGAT 68 / หน้า 17 / ข้อ 16 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["Bide me a moment.","Grant me a brief respite.","Pray, tarry a little.","Indulge me for a moment.","Allow me a fleeting momen."]},
+{"kp":47,"tp":"Bravo","cr":"หน้าที่ 13 ข้อที่ 17 ตัวเลือกที่ 1","qid":"A-Level_69_p13_q17","loc":"A-Level 69 / หน้า 13 / ข้อ 17 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["Hats off to you","Kudos","Magnifient","Splendid","Encore"]},
+{"kp":48,"tp":"Under the pressure","cr":"Extra ข้อ11 หน้า16 ตัวเลือกที่2","qid":"TGAT_68_p16_q11","loc":"TGAT 68 / หน้า 16 / ข้อ 11 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["Labouring under duress.","Under considerable strain.","In a high-stakes predicament.","In the throes of adversity.","Subject to intense coercion."]},
+{"kp":49,"tp":"Lend me your ear","cr":"Extra ข้อ9 หน้า11 ตัวเลือกที่2","qid":"A-Level_69_p11_q9","loc":"A-Level 69 / หน้า 11 / ข้อ 9 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["Vouchsafe me your attention.","Hearken unto me.","Lend me your undivided attention.","Incline your ear.","Grant me your audience."]},
+{"kp":50,"tp":"to make an analogy","cr":"Extra ข้อ19 หน้า 13 ตัวเลือก 1","qid":"A-Level_69_p13_q19","loc":"A-Level 69 / หน้า 13 / ข้อ 19 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["Use a metaphor","Put it in perspective","paint a picture","Draw a comparison"]},
+{"kp":51,"tp":"Insofar as","cr":"Extra ข้อ13 หน้า 12 ตัวเลือก 1","qid":"A-Level_69_p12_q13","loc":"A-Level 69 / หน้า 12 / ข้อ 13 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["Inasmuch as","To the extent that","to the degree that"]},
+{"kp":52,"tp":"to make matters worse","cr":"Extra ข้อ11 หน้า 11 ตัวเลือก 4","qid":"A-Level_69_p11_q11","loc":"A-Level 69 / หน้า 11 / ข้อ 11 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["To add insult to injury","To cap it all off","As if that weren't enough","To compound the problem"]},
+{"kp":53,"tp":"Go the extra mile","cr":"EXTRA ข้อ29 หน้า8 ตัวเลือกที่ 3","qid":"TGAT_69_p8_q29","loc":"TGAT 69 / หน้า 8 / ข้อ 29 / ตัวเลือก 3","st":"ตรงตามหน้า Extra","nt":"","syn":["Go above and beyond","Make an extra effort","Exceed expectations","Go above and beyond","Give it your all","Leave no stone unturned"]},
+{"kp":54,"tp":"Give me a Call","cr":"EXTRA ข้อ14 หน้า29 ตัวเลือกที่ 1","qid":"TGAT_67_p29_q14","loc":"TGAT 67 / หน้า 29 / ข้อ 14 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["Give me a ring","Contact me","Get in touch with me","Reach me by phone","Drop me a line","Give me a buzz","Call me up"]},
+{"kp":55,"tp":"came back","cr":"EXTRA ข้อ13 หน้า25 ตัวเลือกที่4","qid":"A-Level_68_p25_q13","loc":"A-Level 68 / หน้า 25 / ข้อ 13 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["get back","turn back","roll back in","head back","circle back"]},
+{"kp":56,"tp":"Give me a hand","cr":"EXTRA ข้อ28 หน้า32 ตัวเลือกที่ 1","qid":"TGAT_67_p32_q28","loc":"TGAT 67 / หน้า 32 / ข้อ 28 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["Assist me","Lend me a hand","Give me some help","Do me a favor","Give me a hand with something","Come to my aid"]},
+{"kp":57,"tp":"broke up with","cr":"EXTRA ข้อ13 หน้า25 ตัวเลือกที่1","qid":"A-Level_68_p25_q13","loc":"A-Level 68 / หน้า 25 / ข้อ 13 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["drift apart","break off with","walk out on","part ways with","call it quits with"]},
+{"kp":58,"tp":"meet up","cr":"EXTRA ข้อ16 หน้า25 ตัวเลือกที่4","qid":"A-Level_68_p25_q16","loc":"A-Level 68 / หน้า 25 / ข้อ 16 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["get together","catch up with","call on","drop in on","link up with"]},
+{"kp":59,"tp":"Burning my bridges","cr":"EXTRA ข้อ15 หน้า 4 ตัวเลือกที่2","qid":"TGAT_69_p4_q15","loc":"TGAT 69 / หน้า 4 / ข้อ 15 / ตัวเลือก 3","st":"คลาดเคลื่อน (แก้ตัวเลือก)","nt":"หน้า Extra ระบุ 'ข้อ 15 หน้า 4 ตัวเลือกที่ 2' แต่ตัวเลือกที่ 2 คือ 'looking into other job openings.' วลี 'burning my bridges with my boss.' อยู่ที่ตัวเลือกที่ 3","syn":["Cut all ties","A clean break","No turning back","Close that chapter","Leave it all behide"]},
+{"kp":60,"tp":"Dead end","cr":"EXTRA ข้อ26 หน้า 17 ตัวเลือกที่1","qid":"TGAT_69_p7_q26","loc":"TGAT 69 / หน้า 7 / ข้อ 26 / ตัวเลือก 1","st":"คลาดเคลื่อน (แก้เลขหน้า)","nt":"หน้า Extra ระบุ 'ข้อ 26 หน้า 17 ตัวเลือกที่ 1' (พิมพ์เลขหน้า 7 เป็น 17) ตำแหน่งจริงคือ TGAT 69 หน้า 7 ข้อ 26 ตัวเลือกที่ 1 ('dead end')","syn":["End of the road","Now here to go","Stuck in a rut","Come to a halt","No way out"]},
+{"kp":61,"tp":"We have a full day","cr":"EXTRA ข้อ10 หน้า 11 ตัวเลือกที่3","qid":"A-Level_69_p11_q10","loc":"A-Level 69 / หน้า 11 / ข้อ 10 / ตัวเลือก 3","st":"ตรงตามหน้า Extra","nt":"","syn":["A whole day together","Our day, Our time","A day full of us","Nothing but time","We've got all day"]},
+{"kp":62,"tp":"DO ME A FAVOR","cr":"EXTRA หน้า 32 ข้อ 27 ตัวเลือกที่ 4","qid":"TGAT_67_p32_q27","loc":"TGAT 67 / หน้า 32 / ข้อ 27 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["HELP ME.","GIVE ME A HAND.","LEND A HAND.","DO ME A KINDNESS.","DO ME A SOLID."]},
+{"kp":63,"tp":"HANG IN THERE","cr":"EXTRA หน้า 7 ข้อ 27 ตัวเลือกที่ 3","qid":"TGAT_69_p7_q27","loc":"TGAT 69 / หน้า 7 / ข้อ 27 / ตัวเลือก 3","st":"ตรงตามหน้า Extra","nt":"","syn":["KEEP YOUR CHIN UP .","KEEP YOUR HEAD UP .","STAY STRONG.","STICK WITH IT.","TOUGH IT OUT.","DON'T GIVE UP."]},
+{"kp":64,"tp":"CHECK OUT","cr":"EXTRA หน้า 29 ข้อ 14 ตัวเลือกที่ 4","qid":"TGAT_67_p29_q14","loc":"TGAT 67 / หน้า 29 / ข้อ 14 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["TAKE A LOOK.","HAVE A LOOK.","GET A LOAD OF.","INSPECT.","EXAMINE."]},
+{"kp":65,"tp":"we're off today","cr":"Extra ข้อที่ 10 หน้าที่ 11 ตัวเลือกที่ 2","qid":"A-Level_69_p11_q10","loc":"A-Level 69 / หน้า 11 / ข้อ 10 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["We have the day off","We're not working today","We're free today","We're taking today off","We're on holiday today"]},
+{"kp":66,"tp":"we lost a day","cr":"Extra ข้อที่ 10 หน้าที่ 11 ตัวเลือกที่ 1","qid":"A-Level_69_p11_q10","loc":"A-Level 69 / หน้า 11 / ข้อ 10 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["We wasted a day","A day slipped away","We let a day go by","We missed a whole day","A day was wasted"]},
+{"kp":67,"tp":"hit the sack","cr":"Extra ข้อที่ 29 หน้าที่ 8 ตัวเลือกที่ 1","qid":"TGAT_69_p8_q29","loc":"TGAT 69 / หน้า 8 / ข้อ 29 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["Go to bed","Turn in","Call it a night","Hit the hay","Get some sleep"]},
+{"kp":68,"tp":"Needles to say","cr":"Extra ข้อ 15 หน้า 25 ตัวเลือกที่ 2","qid":"A-Level_68_p25_q15","loc":"A-Level 68 / หน้า 25 / ข้อ 15 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["Obviously","Of course","Certainly","Naturally","Without a doubt"]},
+{"kp":69,"tp":"I'm up to my ears","cr":"Extra ข้อ 9 หน้า 11 ตัวเลือกที่ 3","qid":"A-Level_69_p11_q9","loc":"A-Level 69 / หน้า 11 / ข้อ 9 / ตัวเลือก 3","st":"ตรงตามหน้า Extra","nt":"","syn":["Up to my neck","Up to one's eyes","Snowed under","Swamped with work","Buried in work"]},
+{"kp":70,"tp":"Play it by ear","cr":"Extra ข้อ 16 หน้า 13 ตัวเลือกที่ 2","qid":"A-Level_69_p13_q16","loc":"A-Level 69 / หน้า 13 / ข้อ 16 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["Wait and see","Improvise","Be flexible","Make it up as you go","Adapt to the situation"]},
+{"kp":71,"tp":"You're very welcome","cr":"Extra ข้อ 2 หน้า 1 ตัวเลือกที่ 1","qid":"TGAT_69_p1_q2","loc":"TGAT 69 / หน้า 1 / ข้อ 2 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["No trouble at all.","Don't mention it.","Anytime.","Glad to be of assistance.","Happy to oblige."]},
+{"kp":72,"tp":"Don't sweat it","cr":"Extra ข้อ 2 หน้า 1 ตัวเลือกที่ 4","qid":"TGAT_69_p1_q2","loc":"TGAT 69 / หน้า 1 / ข้อ 2 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["Without apprehension","Beyond concern","Free from distress","No cause for alarm","At ease"]},
+{"kp":73,"tp":"Nice to meet you","cr":"Extra ข้อ 3 หน้า 1 ตัวเลือกที่ 1","qid":"TGAT_69_p1_q3","loc":"TGAT 69 / หน้า 1 / ข้อ 3 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["Pleased to make your acquaintance.","Delighted to encounter you.","Honored to be introduced to you.","Privileged to establish a connection with you.","Thrilled to have this opportunity to meet."]},
+{"kp":74,"tp":"On the other hand","cr":"หน้า 12 ข้อ 13 ตัวเลือก 3.","qid":"A-Level_69_p12_q13","loc":"A-Level 69 / หน้า 12 / ข้อ 13 / ตัวเลือก 3","st":"ตรงตามหน้า Extra","nt":"","syn":["On the flip side","On the contrary","At the same time","Conversely","In contrast"]},
+{"kp":74,"tp":"Be carefull of","cr":"หน้า 29. ข้อ 16 ตัวเลือก 2.","qid":"TGAT_67_p29_q16","loc":"TGAT 67 / หน้า 29 / ข้อ 16 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["Watch out for","Look out of","Beware of","Be cautious of","Be wary of"]},
+{"kp":74,"tp":"Move from","cr":"หน้า 29 ข้อ 16 ตัวเลือก 4.","qid":"TGAT_67_p29_q16","loc":"TGAT 67 / หน้า 29 / ข้อ 16 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["Move on from","Move forward","Break away from","Shift away from","Move out of"]},
+{"kp":75,"tp":"Give me a hand","cr":"หน้า 32 ข้อ 28 ตัวเลือก 1","qid":"TGAT_67_p32_q28","loc":"TGAT 67 / หน้า 32 / ข้อ 28 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["Help me out","Lend me a hand","Do me a favor","Pitch in","Assist me"]},
+{"kp":76,"tp":"Just a moment","cr":"หน้า 32 ข้อ 26 ตัวเลือก 1","qid":"TGAT_67_p32_q26","loc":"TGAT 67 / หน้า 32 / ข้อ 26 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["Bear with me","Just a sec","Hold on","Hang on","Give me a minute"]},
+{"kp":77,"tp":"Give me a lift","cr":"หน้า 32 ข้อ 28 ตัวเลือก 2","qid":"TGAT_67_p32_q28","loc":"TGAT 67 / หน้า 32 / ข้อ 28 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["Give me a ride","Drop me off","Take me to","Pick me up","Drive me"]},
+{"kp":78,"tp":"no pain, no gain","cr":"Extra หน้า 35 ข้อ 10 ตัวเลือก 2","qid":"A-Level_67_p35_q10","loc":"A-Level 67 / หน้า 35 / ข้อ 10 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["No effort, no reward","Nothing worth having comes easy","through hardship to success","earned, not given","growth through adversity","no struggle, no progress"]},
+{"kp":79,"tp":"dream come true","cr":"Extra หน้า 26 ข้อ 20 ตัวเลือก 2","qid":"A-Level_68_p26_q20","loc":"A-Level 68 / หน้า 26 / ข้อ 20 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["Become a reality","a prayer answered","a wish fulfilled","crowning achievement","beyond my dreams","a fantasy made real"]},
+{"kp":80,"tp":"born and bred","cr":"Extra หน้า 18 ข้อ 19 ตัวเลือก 2","qid":"TGAT_68_p18_q19","loc":"TGAT 68 / หน้า 18 / ข้อ 19 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["Born and raised","Lifelong local","Lifelong resident","Homegrown","Native","True-blue local","Rooted in","Of this soil"]},
+{"kp":81,"tp":"Time's up","cr":"EXTRA ข้อ 11 หน้า28 ตัวเลือกที่4","qid":"TGAT_67_p28_q11","loc":"TGAT 67 / หน้า 28 / ข้อ 11 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["The clock has run out","Time has expired","Hit the deadline","Sands of time have run out","The eleventh hour has passed","That's a wrap"]},
+{"kp":82,"tp":"A matter of luck","cr":"EXTRA ข้อ 11 หน้า28 ตัวเลือกที่2","qid":"TGAT_67_p28_q11","loc":"TGAT 67 / หน้า 28 / ข้อ 11 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["A roll of the dice","Luck of the draw","A stroke of fortune","In the lap of the gods","A fluke","A toss-up"]},
+{"kp":83,"tp":"Do you need a hand","cr":"EXTRA ข้อ 6 หน้า2 ตัวเลือกที่1","qid":"TGAT_69_p2_q6","loc":"TGAT 69 / หน้า 2 / ข้อ 6 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["Take some off the load off","Jump in and help out","step on someone's toes","Lend a shoulder","Drowning in work","Ease the burden"]},
+{"kp":84,"tp":"pass on","cr":"หน้า 33 ข้อ 30 ตัวเลือกที่ 4","qid":"TGAT_67_p33_q30","loc":"TGAT 67 / หน้า 33 / ข้อ 30 / ตัวเลือก 4","st":"ตรงตามหน้า Extra","nt":"","syn":["Pass along","Hand down","Hand over","give out","send over","put across"]},
+{"kp":85,"tp":"stay up","cr":"หน้า 33 conversation 1 คำถามที่ 2","qid":null,"loc":"A-Level 67 / หน้า 33 Conversation 1 (บทสนทนาก่อนข้อ 2)","st":"ไม่อยู่ในตัวเลือก (อยู่ในบทสนทนา)","nt":"หน้า Extra ระบุ 'หน้า 33 conversation 1 คำถามที่ 2' — คำว่า 'stay up' อยู่ในบทสนทนาของ Oat ('Why? Did you stay up late last night?') ก่อนช่องว่าง (2) ไม่ได้อยู่ในตัวเลือก 1–4 จึงไม่นำไปต่อท้ายช้อยส์","syn":["Pull an all-nighter","Burn the midnight oil","Sit up","Be awake","Remain awake","Keep late hours"]},
+{"kp":86,"tp":"improve","cr":"Extra ข้อที่ 12 หน้าที่ 24 ตัวเลือกที่ 2","qid":"A-Level_68_p24_q12","loc":"A-Level 68 / หน้า 24 / ข้อ 12 / ตัวเลือก 2","st":"ตรงตามหน้า Extra","nt":"","syn":["Enhance","Upgrade","Refine","Strengthen","Optimize"]},
+{"kp":87,"tp":"send you off","cr":"หน้า 33 ข้อ 29 ตัวเลือกที่ 1","qid":"TGAT_67_p33_q29","loc":"TGAT 67 / หน้า 33 / ข้อ 29 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["See you off","Drop you off","Give you a ride","Give you a lift","Take you to...","Walk you out","Walk you to...","Escort you out","Bid you farewell","Say goodbye to you"]},
+{"kp":88,"tp":"Insofar as","cr":"Extra ข้อที่ 13 หน้าที่ 12 ตัวเลือกที่ 1","qid":"A-Level_69_p12_q13","loc":"A-Level 69 / หน้า 12 / ข้อ 13 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["To the extent that","As long as","To the extent of","Regarding","To the degree that"]},
+{"kp":89,"tp":"I'm all ears.","cr":"Extra ข้อที่ 9 หน้าที่ 11 ตัวเลือกที่ 1","qid":"A-Level_69_p11_q9","loc":"A-Level 69 / หน้า 11 / ข้อ 9 / ตัวเลือก 1","st":"ตรงตามหน้า Extra","nt":"","syn":["I'm listening.","I'm paying attention.","I'm listening carefully.","Tell me more.","I'm open to hearing it."]}
+];
+
+    const SETS = ['ทั้งหมด', 'TGAT 69', 'A-Level 69', 'TGAT 68', 'A-Level 68', 'TGAT 67', 'A-Level 67'];
+    let activeSet = 'ทั้งหมด';
+    let searchTerm = '';
+    let showAnswers = true;
+    let onlyExtra = false;
+
+    const esc = (s) => String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
+    const elExercises = document.getElementById('view-exercises');
+    const elExtra = document.getElementById('view-extra');
+    const elControls = document.getElementById('exercise-controls');
+    const elFilters = document.getElementById('set-filters');
+    const elSearch = document.getElementById('search-input');
+    const elToggleAns = document.getElementById('toggle-answers');
+    const elToggleOnlyExtra = document.getElementById('toggle-only-extra');
+    const elVisibleCount = document.getElementById('visible-count');
+    const btnTabEx = document.getElementById('tab-exercises');
+    const btnTabExtra = document.getElementById('tab-extra');
+    const btnTheme = document.getElementById('theme-toggle');
+
+    function applyTheme(theme) {
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        btnTheme.textContent = 'โหมดสว่าง';
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        btnTheme.textContent = 'โหมดมืด';
+      }
+      try { localStorage.setItem('extra_theme', theme); } catch (_) {}
+    }
+
+    (function initTheme() {
+      let saved = 'light';
+      try { saved = localStorage.getItem('extra_theme') || 'light'; } catch (_) {}
+      applyTheme(saved);
+    })();
+
+    btnTheme.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      applyTheme(isDark ? 'light' : 'dark');
+    });
+
+    function setTab(tab) {
+      if (tab === 'exercises') {
+        elExercises.classList.remove('hidden');
+        elControls.classList.remove('hidden');
+        elExtra.classList.add('hidden');
+        btnTabEx.classList.add('active');
+        btnTabExtra.classList.remove('active');
+      } else {
+        elExercises.classList.add('hidden');
+        elControls.classList.add('hidden');
+        elExtra.classList.remove('hidden');
+        btnTabExtra.classList.add('active');
+        btnTabEx.classList.remove('active');
+      }
+    }
+
+    function renderFilterPills() {
+      elFilters.innerHTML = SETS.map((s) => {
+        const cls = s === activeSet ? 'pill active' : 'pill';
+        return `<button type="button" data-set="${esc(s)}" class="${cls}">${esc(s)}</button>`;
+      }).join('');
+      elFilters.querySelectorAll('button').forEach((b) => {
+        b.addEventListener('click', () => {
+          activeSet = b.getAttribute('data-set');
+          renderFilterPills();
+          renderExercises();
+        });
+      });
+    }
+
+    function matchesSearch(q, term) {
+      if (!term) return true;
+      const t = term.toLowerCase();
+      if (`ข้อ ${q.q} หน้า ${q.p}`.toLowerCase().includes(t)) return true;
+      if (`หน้า ${q.p} ข้อ ${q.q}`.toLowerCase().includes(t)) return true;
+      if (q.s.toLowerCase().includes(t)) return true;
+      if ((q.pt || '').toLowerCase().includes(t)) return true;
+      if ((q.cv || '').toLowerCase().includes(t)) return true;
+      for (const ch of q.c) {
+        if (ch.t.toLowerCase().includes(t)) return true;
+        for (const ei of ch.e) {
+          const ex = EXTRAS[ei];
+          if (`extra หน้า ${ex.kp}`.includes(t)) return true;
+          if (ex.tp.toLowerCase().includes(t)) return true;
+          if (ex.syn.some((syn) => syn.toLowerCase().includes(t))) return true;
+        }
+      }
+      return false;
+    }
+
+    function renderExercises() {
+      const filtered = QUESTIONS.filter((q) => {
+        if (activeSet !== 'ทั้งหมด' && q.s !== activeSet) return false;
+        if (onlyExtra && !q.c.some((ch) => ch.e.length > 0)) return false;
+        if (!matchesSearch(q, searchTerm.trim())) return false;
+        return true;
+      });
+
+      elVisibleCount.textContent = `แสดง ${filtered.length} / ${QUESTIONS.length} ข้อ`;
+
+      if (filtered.length === 0) {
+        elExercises.innerHTML = `<div class="empty-box">ไม่พบข้อที่ตรงกับเงื่อนไขที่ค้นหา</div>`;
+        return;
+      }
+
+      let html = '';
+      let lastGroup = '';
+      for (const q of filtered) {
+        const groupKey = [q.s, q.pt, q.cv].filter(Boolean).join(' · ');
+        if (groupKey !== lastGroup) {
+          if (lastGroup !== '') html += '</div></div>';
+          lastGroup = groupKey;
+          html += `
+            <div class="section-group">
+              <div class="section-head">
+                <h2>${esc(q.s)}${q.pt ? ' — ' + esc(q.pt) : ''}</h2>
+                ${q.cv ? `<span>${esc(q.cv)}</span>` : ''}
+              </div>
+              <div class="cards-stack">
+          `;
+        }
+
+        const choicesHtml = q.c.map((ch) => {
+          const isAns = showAnswers && ch.n === q.a;
+          const badgeCls = isAns ? 'num-badge answer' : 'num-badge';
+          const textCls = isAns ? 'choice-th answer' : 'choice-th';
+
+          const extrasHtml = ch.e.map((ei) => {
+            const ex = EXTRAS[ei];
+            return `
+              <div class="extra-box">
+                <span class="extra-label">Extra หน้า ${ex.kp}</span>
+                <span class="extra-target">(${esc(ex.tp)}):</span>
+                <span>${esc(ex.syn.join(' / '))}</span>
+              </div>
+            `;
+          }).join('');
+
+          return `
+            <div class="choice-row">
+              <span class="${badgeCls}" aria-label="ตัวเลือก ${ch.n}${isAns ? ' เฉลย' : ''}">${ch.n}</span>
+              <div class="choice-body">
+                <div class="${textCls}">${esc(ch.t)}</div>
+                ${extrasHtml}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        html += `
+          <article id="${esc(q.id)}" class="card">
+            <div class="card-head">
+              <div class="card-title-row">
+                <span class="q-num">ข้อ ${q.q}</span>
+                <span class="page-tag">หน้า ${q.p}</span>
+              </div>
+              <span class="set-tag">${esc(q.s)}</span>
+            </div>
+            <div class="choices">${choicesHtml}</div>
+          </article>
+        `;
+      }
+      if (lastGroup !== '') html += '</div></div>';
+      elExercises.innerHTML = html;
+    }
+
+    function jumpToQuestion(qid) {
+      if (!qid) return;
+      activeSet = 'ทั้งหมด';
+      onlyExtra = false;
+      searchTerm = '';
+      elSearch.value = '';
+      elToggleOnlyExtra.checked = false;
+      setTab('exercises');
+      renderFilterPills();
+      renderExercises();
+      const target = document.getElementById(qid);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.classList.add('highlight');
+        setTimeout(() => target.classList.remove('highlight'), 2000);
+      }
+    }
+
+    function renderExtraView() {
+      const nonExact = EXTRAS.filter((x) => x.st !== 'ตรงตามหน้า Extra');
+      const matchedCount = EXTRAS.filter((x) => x.qid !== null).length;
+
+      const summaryHtml = `
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">หน้าใน Extra</div>
+            <div class="stat-val">89 หน้า (91 รายการ)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">ต่อท้ายในตัวเลือก</div>
+            <div class="stat-val green">${matchedCount} รายการ</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">หน้าอ่านไม่ออก</div>
+            <div class="stat-val">0 หน้า</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">คลาดเคลื่อน / ไม่อยู่ในตัวเลือก</div>
+            <div class="stat-val amber">${nonExact.length} รายการ</div>
+          </div>
+        </div>
+      `;
+
+      const notesRows = nonExact.map((r) => `
+        <tr>
+          <td style="font-weight:700; white-space:nowrap;">หน้า ${r.kp}</td>
+          <td><code>${esc(r.tp)}</code></td>
+          <td style="color:var(--muted);">${esc(r.cr)}</td>
+          <td>
+            <div>${r.qid ? `<button type="button" data-qid="${esc(r.qid)}" class="jump-btn">${esc(r.loc)}</button>` : esc(r.loc)}</div>
+            <div class="note-sub">${esc(r.nt)}</div>
+          </td>
+          <td><span class="status-pill warn">${esc(r.st)}</span></td>
+        </tr>
+      `).join('');
+
+      const allRows = EXTRAS.map((r) => {
+        const isOk = r.st === 'ตรงตามหน้า Extra';
+        const pillCls = isOk ? 'status-pill ok' : 'status-pill warn';
+        const locHtml = r.qid
+          ? `<button type="button" data-qid="${esc(r.qid)}" class="jump-btn">${esc(r.loc)}</button>`
+          : `<span style="color:var(--muted);">${esc(r.loc)}</span>`;
+        return `
+          <tr>
+            <td style="font-weight:700; white-space:nowrap;">หน้า ${r.kp}</td>
+            <td>
+              <div style="font-weight:600;">${esc(r.tp)}</div>
+              <div class="syn-sub">${esc(r.syn.join(' / '))}</div>
+            </td>
+            <td style="color:var(--muted);">${esc(r.cr)}</td>
+            <td>${locHtml}</td>
+            <td><span class="${pillCls}">${esc(r.st)}</span></td>
+          </tr>
+        `;
+      }).join('');
+
+      elExtra.innerHTML = `
+        ${summaryHtml}
+        <div class="table-card">
+          <div class="table-head">
+            <h2>รายการที่ระบุตำแหน่งคลาดเคลื่อน / ไม่ครบ / ไม่อยู่ในตัวเลือก (${nonExact.length} รายการ)</h2>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Extra</th>
+                  <th>คำ/วลีหลัก</th>
+                  <th>ที่ระบุบนหน้า Extra</th>
+                  <th>ตำแหน่งจริง / หมายเหตุ</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+              <tbody>${notesRows}</tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-head">
+            <h2>ตารางจับคู่ Extra ครบทุกหน้า (หน้า 1–89 · 91 รายการ)</h2>
+            <p>คลิกที่ตำแหน่งจริงในแบบฝึกเพื่อกระโดดไปยังข้อนั้นทันที</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Extra</th>
+                  <th>คำ/วลีหลัก และข้อมูล Extra</th>
+                  <th>ที่ระบุบนหน้า Extra</th>
+                  <th>ตำแหน่งจริงในแบบฝึก</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+              <tbody>${allRows}</tbody>
+            </table>
+          </div>
+        </div>
+      `;
+
+      elExtra.querySelectorAll('button[data-qid]').forEach((btn) => {
+        btn.addEventListener('click', () => jumpToQuestion(btn.getAttribute('data-qid')));
+      });
+    }
+
+    btnTabEx.addEventListener('click', () => setTab('exercises'));
+    btnTabExtra.addEventListener('click', () => setTab('extra'));
+    elSearch.addEventListener('input', (e) => {
+      searchTerm = e.target.value;
+      renderExercises();
+    });
+    elToggleAns.addEventListener('change', (e) => {
+      showAnswers = e.target.checked;
+      renderExercises();
+    });
+    elToggleOnlyExtra.addEventListener('change', (e) => {
+      onlyExtra = e.target.checked;
+      renderExercises();
+    });
+
+    renderFilterPills();
+    renderExercises();
+    renderExtraView();
+  </script>
+</body>
+</html>
